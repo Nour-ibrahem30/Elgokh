@@ -1,0 +1,27 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+
+    "progress": {
+      "$studentUid": {
+        "$courseId": {
+          ".read": "auth != null && (auth.uid == $studentUid || auth.token.role == 'teacher')",
+          ".write": "auth != null && (auth.uid == $studentUid || auth.token.role == 'teacher')"
+        }
+      }
+    },
+
+    "notifications": {
+      ".read": "auth != null",
+      ".write": "auth != null && auth.token.role == 'teacher'"
+    },
+
+    "liveChat": {
+      "$courseId": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    }
+  }
+}

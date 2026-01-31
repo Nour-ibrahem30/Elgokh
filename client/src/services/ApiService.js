@@ -1,165 +1,199 @@
-import axios from 'axios';
+import { collection, getDocs, query, where, doc, getDoc } from "firebase/firestore";
+import { db } from "./firebase";
+import { fetchVideos, createVideo, updateVideo, deleteVideo } from "./VideosService";
+import { fetchExams, createExam, updateExam, deleteExam } from "./ExamsService";
+import { fetchNotes, createNote, updateNote, deleteNote } from "./NotesService";
 
 class ApiService {
   // خدمات الطلاب
   async getStudentDashboard() {
-    const response = await axios.get('/api/students/dashboard');
-    return response.data;
+    // جلب بيانات لوحة التحكم للطالب من Firestore
+    // افتراضيًا، جلب الفيديوهات والامتحانات والملاحظات
+    const [videos, exams, notes] = await Promise.all([
+      fetchVideos(),
+      fetchExams(),
+      fetchNotes()
+    ]);
+    return { videos, exams, notes };
   }
 
   async getStudentStats() {
-    const response = await axios.get('/api/students/stats');
-    return response.data;
+    // حساب إحصائيات الطالب
+    const exams = await fetchExams();
+    const videos = await fetchVideos();
+    // حساب المتوسط والإنجازات
+    return {
+      totalExams: exams.length,
+      totalVideos: videos.length,
+      // إضافة حسابات أخرى حسب الحاجة
+    };
   }
 
   async updateVideoWatchTime(videoId, watchTime, completed) {
-    const response = await axios.post(`/api/students/video/${videoId}/watch`, {
-      watchTime,
-      completed
-    });
-    return response.data;
+    // تحديث وقت المشاهدة في Firestore
+    await updateVideo(videoId, { watchTime, completed });
+    return { success: true };
   }
 
   // خدمات المدرس
   async getTeacherDashboard() {
-    const response = await axios.get('/api/teacher/dashboard');
-    return response.data;
+    const [videos, exams, notes, students] = await Promise.all([
+      fetchVideos(),
+      fetchExams(),
+      fetchNotes(),
+      this.getStudentsList()
+    ]);
+    return { videos, exams, notes, students };
   }
 
   async getStudentsList(params = {}) {
-    const response = await axios.get('/api/teacher/students', { params });
-    return response.data;
+    const q = query(collection(db, "users"), where("role", "==", "student"));
+    const studentsSnapshot = await getDocs(q);
+    return studentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   }
 
   async getStudentDetails(studentId) {
-    const response = await axios.get(`/api/teacher/students/${studentId}`);
-    return response.data;
+    const studentDoc = await getDoc(doc(db, "users", studentId));
+    if (studentDoc.exists()) {
+      return { id: studentDoc.id, ...studentDoc.data() };
+    }
+    throw new Error("الطالب غير موجود");
   }
 
   async sendNotificationToStudent(studentId, notification) {
-    const response = await axios.post(`/api/teacher/students/${studentId}/notify`, notification);
-    return response.data;
+    // إرسال إشعار إلى الطالب عبر Firestore أو Realtime DB
+    // للتبسيط، إضافة إلى مجموعة الإشعارات
+    await addDoc(collection(db, "notifications"), {
+      ...notification,
+      studentId,
+      timestamp: new Date()
+    });
+    return { success: true };
   }
 
   // خدمات الفيديوهات
   async getVideos(params = {}) {
-    const response = await axios.get('/api/videos', { params });
-    return response.data;
+    return await fetchVideos(params.courseId);
   }
 
   async getVideo(videoId) {
-    const response = await axios.get(`/api/videos/${videoId}`);
-    return response.data;
+    const videoDoc = await getDoc(doc(db, "videos", videoId));
+    if (videoDoc.exists()) {
+      return { id: videoDoc.id, ...videoDoc.data() };
+    }
+    throw new Error("الفيديو غير موجود");
   }
 
-  async createVideo(formData) {
-    const response = await axios.post('/api/videos', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    return response.data;
+  async createVideo(videoData) {
+    return await createVideo(videoData);
   }
 
   async updateVideo(videoId, videoData) {
-    const response = await axios.put(`/api/videos/${videoId}`, videoData);
-    return response.data;
+    return await updateVideo(videoId, videoData);
   }
 
   async deleteVideo(videoId) {
-    const response = await axios.delete(`/api/videos/${videoId}`);
-    return response.data;
+    return await deleteVideo(videoId);
   }
 
   // خدمات الامتحانات
   async getExams(params = {}) {
-    const response = await axios.get('/api/exams', { params });
-    return response.data;
+    return await fetchExams(params.courseId);
   }
 
   async getExam(examId) {
-    const response = await axios.get(`/api/exams/${examId}`);
-    return response.data;
+    const examDoc = await getDoc(doc(db, "exams", examId));
+    if (examDoc.exists()) {
+      return { id: examDoc.id, ...examDoc.data() };
+    }
+    throw new Error("الامتحان غير موجود");
   }
 
   async createExam(examData) {
-    const response = await axios.post('/api/exams', examData);
-    return response.data;
+    return await createExam(examData);
   }
 
   async submitExam(examId, answers, startedAt, timeSpent) {
-    const response = await axios.post(`/api/exams/${examId}/submit`, {
+    // حفظ إجابات الامتحان
+    await addDoc(collection(db, "examResults"), {
+      examId,
       answers,
       startedAt,
-      timeSpent
+      timeSpent,
+      submittedAt: new Date()
     });
-    return response.data;
+    return { success: true };
   }
 
   async getExamResults(examId) {
-    const response = await axios.get(`/api/exams/${examId}/results`);
-    return response.data;
+    const q = query(collection(db, "examResults"), where("examId", "==", examId));
+    const resultsSnapshot = await getDocs(q);
+    return resultsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   }
 
   // خدمات الملاحظات
   async getNotes(params = {}) {
-    const response = await axios.get('/api/notes', { params });
-    return response.data;
+    return await fetchNotes(params.courseId);
   }
 
   async getNote(noteId) {
-    const response = await axios.get(`/api/notes/${noteId}`);
-    return response.data;
+    const noteDoc = await getDoc(doc(db, "notes", noteId));
+    if (noteDoc.exists()) {
+      return { id: noteDoc.id, ...noteDoc.data() };
+    }
+    throw new Error("الملاحظة غير موجودة");
   }
 
-  async createNote(formData) {
-    const response = await axios.post('/api/notes', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    return response.data;
+  async createNote(noteData) {
+    return await createNote(noteData);
   }
 
   async updateNote(noteId, noteData) {
-    const response = await axios.put(`/api/notes/${noteId}`, noteData);
-    return response.data;
+    return await updateNote(noteId, noteData);
   }
 
   async deleteNote(noteId) {
-    const response = await axios.delete(`/api/notes/${noteId}`);
-    return response.data;
+    return await deleteNote(noteId);
   }
 
   async markNoteAsRead(noteId) {
-    const response = await axios.post(`/api/notes/${noteId}/read`);
+    // تحديث حالة القراءة
+    await updateNote(noteId, { read: true });
+    return { success: true };
+  }
     return response.data;
   }
 
   // خدمات الإشعارات
   async getNotifications(params = {}) {
-    const response = await axios.get('/api/notifications', { params });
-    return response.data;
+    const q = query(collection(db, "notifications"), where("studentId", "==", params.studentId || ""));
+    const notificationsSnapshot = await getDocs(q);
+    return notificationsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   }
 
   async markNotificationAsRead(notificationId) {
-    const response = await axios.put(`/api/notifications/${notificationId}/read`);
-    return response.data;
+    await updateDoc(doc(db, "notifications", notificationId), { read: true });
+    return { success: true };
   }
 
   async markAllNotificationsAsRead() {
-    const response = await axios.put('/api/notifications/read-all');
-    return response.data;
+    // للتبسيط، جلب جميع الإشعارات غير المقروءة وتحديثها
+    const q = query(collection(db, "notifications"), where("read", "==", false));
+    const snapshot = await getDocs(q);
+    const updates = snapshot.docs.map(doc => updateDoc(doc.ref, { read: true }));
+    await Promise.all(updates);
+    return { success: true };
   }
 
   async deleteNotification(notificationId) {
-    const response = await axios.delete(`/api/notifications/${notificationId}`);
-    return response.data;
+    await deleteDoc(doc(db, "notifications", notificationId));
+    return { success: true };
   }
 
   async getUnreadNotificationsCount() {
-    const response = await axios.get('/api/notifications/unread-count');
-    return response.data;
+    const q = query(collection(db, "notifications"), where("read", "==", false));
+    const snapshot = await getDocs(q);
+    return { count: snapshot.size };
   }
 }
 

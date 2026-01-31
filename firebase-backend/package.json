@@ -1,0 +1,23 @@
+{
+  "name": "firebase-backend",
+  "version": "1.0.0",
+  "description": "Example Firebase backend scaffold (Admin SDK, Firestore, RTDB, rules, functions)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "start:dev": "nodemon src/index.js",
+    "deploy:functions": "firebase deploy --only functions",
+    "lint": "echo 'no lint configured'"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "firebase-admin": "^11.11.0",
+    "firebase-functions": "^4.4.0",
+    "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": "16"
+  }
+}

@@ -1,113 +1,106 @@
-import axios from 'axios';
-
-const API_URL = '/api/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { auth, db } from "./firebase";
 
 class AuthService {
   constructor() {
-    // إعداد axios interceptor للتوكن
-    axios.interceptors.request.use(
-      (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => {
-        return Promise.reject(error);
-      }
-    );
+    this.currentUser = null;
 
-    // إعداد interceptor للاستجابات
-    axios.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response?.status === 401) {
-          this.logout();
-          window.location.href = '/login';
+    // مراقبة حالة المصادقة
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        this.currentUser = user;
+        // جلب بيانات إضافية من Firestore
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          this.currentUser = { ...user, ...userDoc.data() };
         }
-        return Promise.reject(error);
+      } else {
+        this.currentUser = null;
       }
-    );
+    });
   }
 
   async login(email, password) {
     try {
-      const response = await axios.post(`${API_URL}/login`, {
-        email,
-        password
-      });
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+      // جلب بيانات المستخدم من Firestore
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        return { user: { ...user, ...userData }, token: await user.getIdToken() };
+      } else {
+        throw new Error("بيانات المستخدم غير موجودة");
       }
-
-      return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'خطأ في الاتصال' };
+      throw { message: error.message || 'خطأ في تسجيل الدخول' };
     }
   }
 
   async register(userData) {
     try {
-      const response = await axios.post(`${API_URL}/register`, userData);
+      const { email, password, name, role = 'student' } = userData;
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-      }
+      // إضافة بيانات إضافية إلى Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        name,
+        email,
+        role,
+        createdAt: new Date(),
+      });
 
-      return response.data;
+      return { user: { ...user, name, email, role }, token: await user.getIdToken() };
     } catch (error) {
-      throw error.response?.data || { message: 'خطأ في الاتصال' };
+      throw { message: error.message || 'خطأ في التسجيل' };
     }
   }
 
   async getCurrentUser() {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) return null;
-
-      const response = await axios.get(`${API_URL}/me`);
-      return response.data;
-    } catch (error) {
-      this.logout();
-      return null;
+    if (this.currentUser) {
+      return this.currentUser;
     }
+    return null;
   }
 
   async updateProfile(profileData) {
     try {
-      const response = await axios.put(`${API_URL}/profile`, profileData);
-      
-      // تحديث بيانات المستخدم في localStorage
-      const user = JSON.parse(localStorage.getItem('user'));
-      const updatedUser = { ...user, ...response.data.user };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      
-      return response.data;
+      if (!this.currentUser) throw new Error("المستخدم غير مصادق عليه");
+
+      const userRef = doc(db, "users", this.currentUser.uid);
+      await updateDoc(userRef, profileData);
+
+      // تحديث البيانات المحلية
+      this.currentUser = { ...this.currentUser, ...profileData };
+      return { user: this.currentUser };
     } catch (error) {
-      throw error.response?.data || { message: 'خطأ في الاتصال' };
+      throw { message: error.message || 'خطأ في تحديث البيانات' };
     }
   }
 
-  logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  async logout() {
+    try {
+      await signOut(auth);
+      this.currentUser = null;
+    } catch (error) {
+      console.error("خطأ في تسجيل الخروج:", error);
+    }
   }
 
   getStoredUser() {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    return this.currentUser;
   }
 
   isAuthenticated() {
-    return !!localStorage.getItem('token');
+    return !!this.currentUser;
   }
 
   getToken() {
-    return localStorage.getItem('token');
+    return this.currentUser ? this.currentUser.getIdToken() : null;
   }
 }
 

@@ -1,43 +1,42 @@
-import io from 'socket.io-client';
+import { ref, onValue, off } from "firebase/database";
+import { rtdb } from "./firebase";
 import { toast } from 'react-toastify';
 
 class NotificationService {
   constructor() {
-    this.socket = null;
+    this.notificationsRef = null;
     this.isConnected = false;
   }
 
-  init(userId) {
-    if (this.socket) {
+  init() {
+    if (this.notificationsRef) {
       this.disconnect();
     }
 
-    this.socket = io('http://localhost:5000', {
-      transports: ['websocket']
-    });
-
-    this.socket.on('connect', () => {
-      console.log('متصل بخادم الإشعارات');
-      this.isConnected = true;
-      this.socket.emit('join', userId);
-    });
-
-    this.socket.on('disconnect', () => {
-      console.log('انقطع الاتصال بخادم الإشعارات');
-      this.isConnected = false;
-    });
-
-    this.socket.on('notification', (notification) => {
-      this.showNotification(notification);
-      
-      // إشعار المتصفح إذا كان مدعوماً
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification(notification.title, {
-          body: notification.message,
-          icon: '/logo192.png',
-          tag: notification.type
-        });
+    // الاستماع للإشعارات في Realtime Database
+    this.notificationsRef = ref(rtdb, 'notifications');
+    
+    onValue(this.notificationsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        // تحويل البيانات إلى مصفوفة
+        const notifications = Object.values(data);
+        // جلب آخر إشعار
+        const latestNotification = notifications[notifications.length - 1];
+        if (latestNotification) {
+          this.showNotification(latestNotification);
+          
+          // إشعار المتصفح إذا كان مدعوماً
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification(latestNotification.title, {
+              body: latestNotification.courseId ? `في المادة ${latestNotification.courseId}` : '',
+              icon: '/logo192.png',
+              tag: 'fdk-notification'
+            });
+          }
+        }
       }
+      this.isConnected = true;
     });
 
     // طلب إذن الإشعارات
@@ -45,41 +44,14 @@ class NotificationService {
   }
 
   showNotification(notification) {
-    const { title, message, type } = notification;
+    const { title, courseId } = notification;
     
-    switch (type) {
-      case 'video':
-        toast.info(`🎥 ${title}: ${message}`, {
-          position: "top-right",
-          autoClose: 5000,
-        });
-        break;
-      case 'note':
-        toast.info(`📝 ${title}: ${message}`, {
-          position: "top-right",
-          autoClose: 5000,
-        });
-        break;
-      case 'exam':
-        toast.warning(`📋 ${title}: ${message}`, {
-          position: "top-right",
-          autoClose: 7000,
-        });
-        break;
-      case 'result':
-        toast.success(`📊 ${title}: ${message}`, {
-          position: "top-right",
-          autoClose: 5000,
-        });
-        break;
-      default:
-        toast.info(`${title}: ${message}`, {
-          position: "top-right",
-          autoClose: 5000,
-        });
-    }
+    // عرض إشعار بسيط
+    toast.info(`📢 ${title}${courseId ? ` - مادة ${courseId}` : ''}`, {
+      position: "top-right",
+      autoClose: 5000,
+    });
   }
-
   async requestNotificationPermission() {
     if ('Notification' in window) {
       if (Notification.permission === 'default') {
@@ -92,9 +64,9 @@ class NotificationService {
   }
 
   disconnect() {
-    if (this.socket) {
-      this.socket.disconnect();
-      this.socket = null;
+    if (this.notificationsRef) {
+      off(this.notificationsRef);
+      this.notificationsRef = null;
       this.isConnected = false;
     }
   }

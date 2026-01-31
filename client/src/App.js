@@ -31,7 +31,7 @@ function App() {
         if (userData) {
           setUser(userData);
           // تهيئة خدمة الإشعارات
-          NotificationService.init(userData.id);
+          NotificationService.init();
         }
       } catch (error) {
         console.error('خطأ في التحقق من المصادقة:', error);
@@ -45,7 +45,7 @@ function App() {
 
   const handleLogin = (userData) => {
     setUser(userData);
-    NotificationService.init(userData.id);
+    NotificationService.init();
   };
 
   const handleLogout = () => {

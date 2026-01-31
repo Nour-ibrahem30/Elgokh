@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isTeacher() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
+    }
+
+    // Users: own record can be read/updated by user; readable by authenticated users
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update, delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Courses: anyone authenticated can read; only teachers can write
+    match /courses/{courseId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isTeacher();
+    }
+
+    // Lessons: read for authenticated; write only teachers
+    match /lessons/{lessonId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isTeacher();
+    }
+
+    // Assignments: teachers only for write
+    match /assignments/{assignmentId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isTeacher();
+    }
+
+    // Exams: teachers only for write
+    match /exams/{examId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isTeacher();
+    }
+
+    // Notes: teachers create; students and teachers read
+    match /notes/{noteId} {
+      allow create: if isTeacher();
+      allow read: if isAuthenticated();
+      allow update, delete: if isTeacher();
+    }
+
+    // Feedback: any authenticated user can create and read their own feedback
+    match /feedback/{feedbackId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isTeacher() || resource.data.userId == request.auth.uid;
+    }
+  }
+}
