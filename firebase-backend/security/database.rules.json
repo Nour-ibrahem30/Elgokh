@@ -5,16 +5,18 @@
 
     "progress": {
       "$studentUid": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid == $studentUid",
         "$courseId": {
-          ".read": "auth != null && (auth.uid == $studentUid || auth.token.role == 'teacher')",
-          ".write": "auth != null && (auth.uid == $studentUid || auth.token.role == 'teacher')"
+          ".read": "auth != null",
+          ".write": "auth != null && auth.uid == $studentUid"
         }
       }
     },
 
     "notifications": {
       ".read": "auth != null",
-      ".write": "auth != null && auth.token.role == 'teacher'"
+      ".write": "auth != null"
     },
 
     "liveChat": {

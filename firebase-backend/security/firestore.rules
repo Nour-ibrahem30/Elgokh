@@ -7,52 +7,60 @@ service cloud.firestore {
     }
 
     function isTeacher() {
-      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
     }
 
-    // Users: own record can be read/updated by user; readable by authenticated users
+    // Users: own record can be read/updated by user; readable by all authenticated users
     match /users/{userId} {
-      allow read: if isAuthenticated();
+      allow read: if true; // Allow reading for browsing
       allow create: if request.auth != null && request.auth.uid == userId;
       allow update, delete: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Courses: anyone authenticated can read; only teachers can write
+    // Courses: anyone can read (browsing is free); only teachers can write
     match /courses/{courseId} {
-      allow read: if isAuthenticated();
+      allow read: if true; // Allow browsing without login
       allow create, update, delete: if isTeacher();
     }
 
-    // Lessons: read for authenticated; write only teachers
+    // Lessons: anyone can read (browsing is free); write only teachers
     match /lessons/{lessonId} {
-      allow read: if isAuthenticated();
+      allow read: if true; // Allow browsing without login
       allow create, update, delete: if isTeacher();
     }
 
-    // Assignments: teachers only for write
+    // Assignments: anyone can read; teachers only for write
     match /assignments/{assignmentId} {
-      allow read: if isAuthenticated();
+      allow read: if true; // Allow browsing without login
       allow create, update, delete: if isTeacher();
     }
 
-    // Exams: teachers only for write
+    // Exams: anyone can read; teachers only for write
     match /exams/{examId} {
-      allow read: if isAuthenticated();
+      allow read: if true; // Allow browsing without login
       allow create, update, delete: if isTeacher();
     }
 
-    // Notes: teachers create; students and teachers read
+    // Notes: anyone can read; teachers create/update/delete
     match /notes/{noteId} {
-      allow create: if isTeacher();
-      allow read: if isAuthenticated();
-      allow update, delete: if isTeacher();
+      allow read: if true; // Allow browsing without login
+      allow create, update, delete: if isTeacher();
     }
 
     // Feedback: any authenticated user can create and read their own feedback
     match /feedback/{feedbackId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated();
-      allow update, delete: if isTeacher() || resource.data.userId == request.auth.uid;
+      allow update, delete: if isTeacher() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+    }
+
+    // Exam Results: students can create their own; teachers can read all
+    match /exam_results/{resultId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isTeacher();
     }
   }
 }

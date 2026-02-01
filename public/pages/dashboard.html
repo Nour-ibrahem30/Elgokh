@@ -1,0 +1,2315 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <title>لوحة التحكم | منصة الفيلسوف التعليمية</title>
+    <meta name="description" content="لوحة تحكم المدرس - إدارة المحتوى التعليمي">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/pages_style/dashboard.css">
+    <style>
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .waves {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="%233b82f6" fill-opacity="0.05"/></svg>') repeat-x;
+            animation: wave 15s linear infinite;
+        }
+
+        .wave:nth-child(2) {
+            bottom: 10px;
+            opacity: 0.5;
+            animation: wave 20s linear infinite reverse;
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        
+        .dashboard-layout,
+        .dashboard-header,
+        .dashboard-main {
+            position: relative;
+            z-index: 10;
+        }
+
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            min-height: calc(100vh - 100px);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-sidebar {
+                position: static;
+                width: 100%;
+            }
+        }
+
+        .dashboard-sidebar {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.7));
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .dashboard-main {
+            background: rgba(15, 23, 42, 0.3);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+        }
+
+        /* Enhanced Dashboard Styles */
+        .dashboard-header {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.98));
+            backdrop-filter: blur(25px);
+            border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+            padding: 1rem 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .dashboard-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #3b82f6, #8b5cf6, transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .dashboard-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+        }
+
+        .logo:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dashboard-user {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-name {
+            color: #f1f5f9;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.75rem 1.25rem;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-name::before {
+            content: '👨‍🏫';
+            font-size: 1.2rem;
+        }
+
+        .user-menu-toggle {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-menu-toggle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+
+        .user-menu-toggle:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        .user-menu-toggle:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        .user-avatar {
+            font-size: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .user-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 1rem);
+            right: 0;
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98));
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
+            min-width: 220px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-menu.active {
+            display: block;
+        }
+
+        .user-menu a, .user-menu button {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            width: 100%;
+            padding: 1rem 1.5rem;
+            text-align: right;
+            color: #f1f5f9;
+            text-decoration: none;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            position: relative;
+        }
+
+        .user-menu a::before {
+            content: '👤';
+            font-size: 1.2rem;
+        }
+
+        .user-menu button::before {
+            content: '🚪';
+            font-size: 1.2rem;
+        }
+
+        .user-menu a:last-child,
+        .user-menu button:last-child {
+            border-bottom: none;
+        }
+
+        .user-menu a:hover, .user-menu button:hover {
+            background: rgba(59, 130, 246, 0.2);
+            padding-right: 2rem;
+            color: #3b82f6;
+        }
+
+        .user-menu button {
+            color: #ef4444;
+        }
+
+        .user-menu button:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .dashboard-section {
+            display: none;
+        }
+
+        .dashboard-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.8));
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.2), transparent);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .stat-card:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: #3b82f6;
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.4);
+        }
+
+        .stat-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6;
+            color: #f1f5f9;
+            transform: translateX(-4px);
+        }
+
+        .sidebar-link.active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+            border-color: #3b82f6;
+            color: #f1f5f9;
+        }
+
+        .sidebar-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: #f1f5f9;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #f1f5f9;
+            font-weight: 500;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            color: #f1f5f9;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(148, 163, 184, 0.2);
+            color: #94a3b8;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(148, 163, 184, 0.3);
+            color: #f1f5f9;
+        }
+
+        .content-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .content-item {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.6));
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 0;
+            background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+            transition: height 0.4s ease;
+        }
+
+        .content-item:hover::before {
+            height: 100%;
+        }
+
+        .content-item:hover {
+            border-color: #3b82f6;
+            transform: translateX(-8px);
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.75));
+        }
+
+        .content-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .content-item-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .content-item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            animation: toastSlideIn 0.3s ease;
+            display: none;
+        }
+
+        .toast.active {
+            display: block;
+        }
+
+        .toast.success {
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+
+        .toast.error {
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .tab-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            color: #f1f5f9;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        .materials-content {
+            display: none;
+        }
+
+        .materials-content.active {
+            display: block;
+        }
+
+        /* Debug Panel */
+        .debug-panel {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            border-radius: 12px;
+            padding: 1rem;
+            max-width: 300px;
+            z-index: 3000;
+            display: none;
+        }
+
+        .debug-panel.active {
+            display: block;
+        }
+
+        .debug-toggle {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 2999;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .debug-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(59, 130, 246, 0.7);
+        }
+
+        .debug-info {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin: 0.5rem 0;
+        }
+
+        .debug-info strong {
+            color: #f1f5f9;
+        }
+
+        .debug-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .debug-btn {
+            flex: 1;
+            padding: 0.5rem;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            color: #3b82f6;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .debug-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+
+        .debug-btn.danger {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .debug-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+    </style>
+</head>
+<body class="dashboard-page">
+    <canvas id="three-canvas"></canvas>
+    <div class="waves">
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+    <a href="#main-content" class="sr-only">تخطى إلى المحتوى الرئيسي</a>
+    
+    <header class="dashboard-header" role="banner">
+        <div class="container">
+            <div class="dashboard-nav">
+                <a href="/" class="logo" aria-label="الصفحة الرئيسية">
+                    <span class="logo-icon" aria-hidden="true">🎓</span>
+                    <span class="logo-text">منصة الفيلسوف</span>
+                </a>
+                
+                <div class="dashboard-user">
+                    <span id="userName" class="user-name"></span>
+                    <button class="user-menu-toggle" aria-label="قائمة المستخدم" aria-expanded="false">
+                        <span class="user-avatar" aria-hidden="true">👤</span>
+                    </button>
+                    <div class="user-menu" role="menu">
+                        <a href="profile.html" role="menuitem">الملف الشخصي</a>
+                        <button id="logoutBtn" role="menuitem">تسجيل الخروج</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-layout">
+        <aside class="dashboard-sidebar" role="navigation" aria-label="القائمة الجانبية">
+            <nav class="sidebar-nav">
+                <a href="#overview" class="sidebar-link active" data-section="overview">
+                    <span class="sidebar-icon" aria-hidden="true">📊</span>
+                    <span>نظرة عامة</span>
+                </a>
+                <a href="#videos" class="sidebar-link" data-section="videos">
+                    <span class="sidebar-icon" aria-hidden="true">🎥</span>
+                    <span>إدارة الفيديوهات</span>
+                </a>
+                <a href="#exams" class="sidebar-link" data-section="exams">
+                    <span class="sidebar-icon" aria-hidden="true">📋</span>
+                    <span>إدارة الامتحانات</span>
+                </a>
+                <a href="#notes" class="sidebar-link" data-section="notes">
+                    <span class="sidebar-icon" aria-hidden="true">📝</span>
+                    <span>إدارة الملاحظات</span>
+                </a>
+                <a href="#materials" class="sidebar-link" data-section="materials">
+                    <span class="sidebar-icon" aria-hidden="true">📚</span>
+                    <span>إدارة المذكرات</span>
+                </a>
+                <a href="#testimonials" class="sidebar-link" data-section="testimonials">
+                    <span class="sidebar-icon" aria-hidden="true">💬</span>
+                    <span>إدارة الآراء</span>
+                </a>
+                <a href="#motivational" class="sidebar-link" data-section="motivational">
+                    <span class="sidebar-icon" aria-hidden="true">✨</span>
+                    <span>الرسائل التحفيزية</span>
+                </a>
+                <a href="#students" class="sidebar-link" data-section="students">
+                    <span class="sidebar-icon" aria-hidden="true">👥</span>
+                    <span>الطلاب</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main id="main-content" class="dashboard-main" role="main">
+            <section id="overview-section" class="dashboard-section active">
+                <h1 class="dashboard-title fade-in">نظرة عامة</h1>
+                
+                <div class="stats-grid slide-in" role="list">
+                    <article class="stat-card hover-lift" role="listitem">
+                        <div class="stat-icon" aria-hidden="true">🎥</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalVideos">0</div>
+                            <div class="stat-label">فيديو</div>
+                        </div>
+                    </article>
+                    
+                    <article class="stat-card hover-lift" role="listitem">
+                        <div class="stat-icon" aria-hidden="true">📋</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalExams">0</div>
+                            <div class="stat-label">امتحان</div>
+                        </div>
+                    </article>
+                    
+                    <article class="stat-card hover-lift" role="listitem">
+                        <div class="stat-icon" aria-hidden="true">👥</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalStudents">0</div>
+                            <div class="stat-label">طالب</div>
+                        </div>
+                    </article>
+                    
+                    <article class="stat-card hover-lift" role="listitem">
+                        <div class="stat-icon" aria-hidden="true">📝</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalNotes">0</div>
+                            <div class="stat-label">ملاحظة</div>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="recent-activity">
+                    <h2>النشاط الأخير</h2>
+                    <div id="recentActivity" class="activity-list"></div>
+                </div>
+            </section>
+
+            <section id="videos-section" class="dashboard-section">
+                <div class="section-header">
+                    <h1 class="dashboard-title">إدارة الفيديوهات</h1>
+                    <button class="btn btn-primary" id="addVideoBtn">
+                        <span aria-hidden="true">➕</span> إضافة فيديو
+                    </button>
+                </div>
+                
+                <div id="videosList" class="content-list"></div>
+            </section>
+
+            <section id="exams-section" class="dashboard-section">
+                <div class="section-header">
+                    <h1 class="dashboard-title">إدارة الامتحانات</h1>
+                    <button class="btn btn-primary" id="addExamBtn">
+                        <span aria-hidden="true">➕</span> إضافة امتحان
+                    </button>
+                </div>
+                
+                <div id="examsList" class="content-list"></div>
+            </section>
+
+            <section id="notes-section" class="dashboard-section">
+                <div class="section-header">
+                    <h1 class="dashboard-title">إدارة الملاحظات</h1>
+                    <button class="btn btn-primary" id="addNoteBtn">
+                        <span aria-hidden="true">➕</span> إضافة ملاحظة
+                    </button>
+                </div>
+                
+                <div id="notesList" class="content-list"></div>
+            </section>
+
+            <section id="materials-section" class="dashboard-section">
+                <div class="section-header">
+                    <h1 class="dashboard-title">إدارة المذكرات والملازم</h1>
+                    <button class="btn btn-primary" id="addMaterialBtn">
+                        <span aria-hidden="true">➕</span> إضافة مذكرة
+                    </button>
+                </div>
+                
+                <div class="materials-tabs" style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                    <button class="tab-btn active" data-grade="1">الصف الأول</button>
+                    <button class="tab-btn" data-grade="2">الصف الثاني</button>
+                    <button class="tab-btn" data-grade="3">الصف الثالث</button>
+                </div>
+                
+                <div id="materialsGrade1" class="materials-content active"></div>
+                <div id="materialsGrade2" class="materials-content" style="display: none;"></div>
+                <div id="materialsGrade3" class="materials-content" style="display: none;"></div>
+            </section>
+
+            <section id="testimonials-section" class="dashboard-section">
+                <div class="section-header">
+                    <h1 class="dashboard-title">إدارة آراء الطلاب</h1>
+                    <button class="btn btn-primary" id="addTestimonialBtn">
+                        <span aria-hidden="true">➕</span> إضافة رأي
+                    </button>
+                </div>
+                
+                <div id="testimonialsList" class="content-list"></div>
+            </section>
+
+            <section id="motivational-section" class="dashboard-section">
+                <div class="section-header">
+                    <h1 class="dashboard-title">💬 إدارة الرسائل التحفيزية</h1>
+                    <button class="btn btn-primary" id="addMotivationalBtn">
+                        <span aria-hidden="true">➕</span> إضافة رسالة
+                    </button>
+                </div>
+                
+                <div style="background: rgba(139, 92, 246, 0.1); border: 2px solid rgba(139, 92, 246, 0.3); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <h3 style="color: #8b5cf6; margin-bottom: 0.5rem;">ℹ️ معلومات</h3>
+                    <p style="color: #cbd5e1; font-size: 0.875rem; margin: 0;">الرسائل التحفيزية تظهر للطلاب كل ساعة في شكل إشعار من الجانب الأيمن. يتم اختيار رسالة عشوائية من القائمة.</p>
+                </div>
+                
+                <div id="motivationalList" class="content-list"></div>
+            </section>
+
+            <section id="students-section" class="dashboard-section">
+                <h1 class="dashboard-title">الطلاب</h1>
+                <div id="studentsList" class="students-grid"></div>
+            </section>
+        </main>
+    </div>
+
+    <div id="modalContainer"></div>
+
+    <!-- Debug Panel -->
+    <button class="debug-toggle" id="debugToggle" title="فتح لوحة التصحيح">🐛</button>
+    <div class="debug-panel" id="debugPanel">
+        <h3 style="color: #f1f5f9; margin-bottom: 1rem; font-size: 1rem;">لوحة التصحيح</h3>
+        <div class="debug-info">
+            <strong>الفيديوهات:</strong> <span id="debugVideos">0</span>
+        </div>
+        <div class="debug-info">
+            <strong>الامتحانات:</strong> <span id="debugExams">0</span>
+        </div>
+        <div class="debug-info">
+            <strong>الملاحظات:</strong> <span id="debugNotes">0</span>
+        </div>
+        <div class="debug-info">
+            <strong>المذكرات:</strong> <span id="debugMaterials">0</span>
+        </div>
+        <div class="debug-info">
+            <strong>حجم البيانات:</strong> <span id="debugSize">0 KB</span>
+        </div>
+        <div class="debug-actions">
+            <button class="debug-btn" id="debugRefresh">تحديث</button>
+            <button class="debug-btn danger" id="debugClear">مسح الكل</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Three.js Scene - Philosophy Brain Model
+        const canvas = document.getElementById('three-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        camera.position.z = 5;
+
+        // Create Brain
+        const brainGeometry = new THREE.IcosahedronGeometry(0.8, 1);
+        const brainMaterial = new THREE.MeshNormalMaterial({ wireframe: true, opacity: 0.3, transparent: true });
+        const brain = new THREE.Mesh(brainGeometry, brainMaterial);
+        scene.add(brain);
+
+        // Create Logic Symbols
+        const symbolGeometry = new THREE.OctahedronGeometry(0.25);
+        const symbolMaterial = new THREE.MeshNormalMaterial({ wireframe: false, opacity: 0.4, transparent: true });
+        
+        const symbols = [];
+        for (let i = 0; i < 6; i++) {
+            const symbol = new THREE.Mesh(symbolGeometry, symbolMaterial);
+            const angle = (i / 6) * Math.PI * 2;
+            symbol.position.x = Math.cos(angle) * 2;
+            symbol.position.y = Math.sin(angle) * 2;
+            symbols.push(symbol);
+            scene.add(symbol);
+        }
+
+        // Create Particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 500;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for (let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 10;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMaterial = new THREE.PointsMaterial({ size: 0.02, color: 0x3b82f6, opacity: 0.6, transparent: true });
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        // Animation
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+            
+            brain.rotation.x += 0.005;
+            brain.rotation.y += 0.005;
+            
+            symbols.forEach((symbol, i) => {
+                const angle = (i / 6) * Math.PI * 2 + time * 0.3;
+                symbol.position.x = Math.cos(angle) * 2;
+                symbol.position.y = Math.sin(angle) * 2;
+                symbol.rotation.x += 0.02;
+                symbol.rotation.y += 0.02;
+            });
+            
+            particlesMesh.rotation.y += 0.0005;
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Dashboard Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load Data from LocalStorage
+            let videos = JSON.parse(localStorage.getItem('videos') || '[]');
+            let exams = JSON.parse(localStorage.getItem('exams') || '[]');
+            let notes = JSON.parse(localStorage.getItem('notes') || '[]');
+            let testimonials = JSON.parse(localStorage.getItem('testimonials') || '[]');
+            let materials = JSON.parse(localStorage.getItem('materials') || '[]');
+            
+            // Save to LocalStorage
+            function saveData() {
+                try {
+                    console.log('=== SAVING DATA ===');
+                    console.log('Videos count:', videos.length);
+                    console.log('Exams count:', exams.length);
+                    console.log('Notes count:', notes.length);
+                    console.log('Materials count:', materials.length);
+                    console.log('Testimonials count:', testimonials.length);
+                    
+                    // Calculate sizes
+                    const videosSize = JSON.stringify(videos).length;
+                    const examsSize = JSON.stringify(exams).length;
+                    const notesSize = JSON.stringify(notes).length;
+                    const materialsSize = JSON.stringify(materials).length;
+                    const testimonialsSize = JSON.stringify(testimonials).length;
+                    const totalSize = videosSize + examsSize + notesSize + materialsSize + testimonialsSize;
+                    
+                    console.log('Total data size:', (totalSize / 1024).toFixed(2), 'KB');
+                    
+                    // Check LocalStorage quota
+                    if (totalSize > 5 * 1024 * 1024) {
+                        console.warn('⚠️ Warning: Data size exceeds 5MB! LocalStorage may fail.');
+                        showToast('تحذير: حجم البيانات كبير جداً! قد يفشل الحفظ.', 'error');
+                    }
+                    
+                    localStorage.setItem('videos', JSON.stringify(videos));
+                    localStorage.setItem('exams', JSON.stringify(exams));
+                    localStorage.setItem('notes', JSON.stringify(notes));
+                    localStorage.setItem('testimonials', JSON.stringify(testimonials));
+                    localStorage.setItem('materials', JSON.stringify(materials));
+                    
+                    console.log('✅ Data saved successfully!');
+                    console.log('===================');
+                    return true;
+                } catch (error) {
+                    console.error('❌ Error saving data:', error);
+                    if (error.name === 'QuotaExceededError') {
+                        showToast('خطأ: مساحة التخزين ممتلئة! احذف بعض الملفات الكبيرة.', 'error');
+                    } else {
+                        showToast('خطأ في حفظ البيانات: ' + error.message, 'error');
+                    }
+                    return false;
+                }
+            }
+
+            // Modal Functions
+            function createModal(title, content, onSubmit) {
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay active';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title">${title}</h2>
+                            <button class="modal-close" aria-label="إغلاق">✕</button>
+                        </div>
+                        <div class="modal-body">
+                            ${content}
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary modal-cancel">إلغاء</button>
+                            <button class="btn btn-primary modal-submit">حفظ</button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+                const closeBtn = modal.querySelector('.modal-close');
+                const cancelBtn = modal.querySelector('.modal-cancel');
+                const submitBtn = modal.querySelector('.modal-submit');
+                
+                function closeModal() {
+                    modal.classList.remove('active');
+                    setTimeout(() => modal.remove(), 300);
+                }
+                
+                closeBtn.addEventListener('click', closeModal);
+                cancelBtn.addEventListener('click', closeModal);
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal();
+                });
+                
+                submitBtn.addEventListener('click', () => {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'جاري الحفظ...';
+                    
+                    const result = onSubmit(closeModal);
+                    
+                    // If result is a promise, wait for it
+                    if (result && typeof result.then === 'function') {
+                        result.then((success) => {
+                            if (success !== false) {
+                                closeModal();
+                            } else {
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = 'حفظ';
+                            }
+                        }).catch(() => {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'حفظ';
+                        });
+                    } else if (result !== false) {
+                        closeModal();
+                    } else {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'حفظ';
+                    }
+                });
+                
+                return modal;
+            }
+
+            function showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type} active`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.classList.remove('active');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            function createConfirmModal(title, message, onConfirm) {
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay active';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title">${title}</h2>
+                            <button class="modal-close" aria-label="إغلاق">✕</button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="color: #f1f5f9; font-size: 1.1rem;">${message}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary modal-cancel">إلغاء</button>
+                            <button class="btn btn-danger modal-confirm">تأكيد</button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+                const closeBtn = modal.querySelector('.modal-close');
+                const cancelBtn = modal.querySelector('.modal-cancel');
+                const confirmBtn = modal.querySelector('.modal-confirm');
+                
+                function closeModal() {
+                    modal.classList.remove('active');
+                    setTimeout(() => modal.remove(), 300);
+                }
+                
+                closeBtn.addEventListener('click', closeModal);
+                cancelBtn.addEventListener('click', closeModal);
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal();
+                });
+                
+                confirmBtn.addEventListener('click', () => {
+                    onConfirm();
+                    closeModal();
+                });
+            }
+
+            // Sidebar Navigation
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            const sections = document.querySelectorAll('.dashboard-section');
+            
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const sectionId = link.getAttribute('data-section');
+                    
+                    sidebarLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                    
+                    sections.forEach(s => s.classList.remove('active'));
+                    document.getElementById(`${sectionId}-section`).classList.add('active');
+                });
+            });
+
+            // User Menu Toggle
+            const userMenuToggle = document.querySelector('.user-menu-toggle');
+            const userMenu = document.querySelector('.user-menu');
+            
+            if (userMenuToggle && userMenu) {
+                userMenuToggle.addEventListener('click', () => {
+                    userMenu.classList.toggle('active');
+                    const isExpanded = userMenu.classList.contains('active');
+                    userMenuToggle.setAttribute('aria-expanded', isExpanded);
+                });
+                
+                document.addEventListener('click', (e) => {
+                    if (!userMenuToggle.contains(e.target) && !userMenu.contains(e.target)) {
+                        userMenu.classList.remove('active');
+                        userMenuToggle.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+
+            // Logout Button
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    createConfirmModal(
+                        'تسجيل الخروج',
+                        'هل أنت متأكد من تسجيل الخروج؟',
+                        () => {
+                            showToast('تم تسجيل الخروج بنجاح!', 'success');
+                            setTimeout(() => {
+                                window.location.href = 'login.html';
+                            }, 1000);
+                        }
+                    );
+                });
+            }
+
+            // Add Video Button
+            const addVideoBtn = document.getElementById('addVideoBtn');
+            if (addVideoBtn) {
+                addVideoBtn.addEventListener('click', function() {
+                    createModal(
+                        'إضافة فيديو جديد',
+                        `
+                        <form id="videoForm">
+                            <div class="form-group">
+                                <label class="form-label">عنوان الفيديو</label>
+                                <input type="text" class="form-input" id="videoTitle" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">نوع الفيديو</label>
+                                <select class="form-select" id="videoType" required>
+                                    <option value="">اختر النوع</option>
+                                    <option value="upload">رفع فيديو من الجهاز</option>
+                                    <option value="youtube">رابط YouTube</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="uploadGroup" style="display: none;">
+                                <label class="form-label">رفع الفيديو</label>
+                                <input type="file" class="form-input" id="videoFile" accept="video/*">
+                                <p style="color: #94a3b8; font-size: 0.875rem; margin-top: 0.5rem;">الحد الأقصى: 50 ميجابايت</p>
+                            </div>
+                            <div class="form-group" id="urlGroup" style="display: none;">
+                                <label class="form-label">رابط الفيديو (YouTube)</label>
+                                <input type="url" class="form-input" id="videoUrl" placeholder="https://youtube.com/...">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">الوصف</label>
+                                <textarea class="form-textarea" id="videoDescription"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">المدة (بالدقائق)</label>
+                                <input type="number" class="form-input" id="videoDuration" min="1">
+                            </div>
+                        </form>
+                        `,
+                        (closeModal) => {
+                            const title = document.getElementById('videoTitle').value.trim();
+                            const type = document.getElementById('videoType').value;
+                            const description = document.getElementById('videoDescription').value.trim();
+                            const duration = document.getElementById('videoDuration').value;
+                            
+                            if (!title || !type) {
+                                showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
+                                return false;
+                            }
+                            
+                            if (type === 'upload') {
+                                const fileInput = document.getElementById('videoFile');
+                                if (!fileInput.files || !fileInput.files[0]) {
+                                    showToast('يرجى اختيار ملف فيديو', 'error');
+                                    return false;
+                                }
+                                
+                                const file = fileInput.files[0];
+                                if (file.size > 50 * 1024 * 1024) {
+                                    showToast('حجم الملف كبير جداً (الحد الأقصى 50 ميجابايت)', 'error');
+                                    return false;
+                                }
+                                
+                                // Return promise for file reading
+                                return new Promise((resolve) => {
+                                    const reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        const videoData = {
+                                            id: Date.now(),
+                                            title,
+                                            description,
+                                            duration,
+                                            url: e.target.result,
+                                            type: 'upload',
+                                            fileName: file.name,
+                                            fileSize: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+                                            createdAt: new Date().toISOString()
+                                        };
+                                        
+                                        videos.push(videoData);
+                                        saveData();
+                                        renderVideos();
+                                        updateStats();
+                                        showToast('تم إضافة الفيديو بنجاح!', 'success');
+                                        resolve(true);
+                                    };
+                                    reader.onerror = function() {
+                                        showToast('حدث خطأ أثناء قراءة الملف', 'error');
+                                        resolve(false);
+                                    };
+                                    reader.readAsDataURL(file);
+                                });
+                            } else {
+                                const url = document.getElementById('videoUrl').value.trim();
+                                if (!url) {
+                                    showToast('يرجى إدخال رابط الفيديو', 'error');
+                                    return false;
+                                }
+                                
+                                const videoData = {
+                                    id: Date.now(),
+                                    title,
+                                    description,
+                                    duration,
+                                    url,
+                                    type: 'youtube',
+                                    createdAt: new Date().toISOString()
+                                };
+                                
+                                videos.push(videoData);
+                                saveData();
+                                renderVideos();
+                                updateStats();
+                                showToast('تم إضافة الفيديو بنجاح!', 'success');
+                                return true;
+                            }
+                        }
+                    );
+                    
+                    // Add event listener for video type change
+                    setTimeout(() => {
+                        const videoTypeSelect = document.getElementById('videoType');
+                        const uploadGroup = document.getElementById('uploadGroup');
+                        const urlGroup = document.getElementById('urlGroup');
+                        
+                        if (videoTypeSelect) {
+                            videoTypeSelect.addEventListener('change', function() {
+                                if (this.value === 'upload') {
+                                    uploadGroup.style.display = 'block';
+                                    urlGroup.style.display = 'none';
+                                } else if (this.value === 'youtube') {
+                                    uploadGroup.style.display = 'none';
+                                    urlGroup.style.display = 'block';
+                                } else {
+                                    uploadGroup.style.display = 'none';
+                                    urlGroup.style.display = 'none';
+                                }
+                            });
+                        }
+                    }, 100);
+                });
+            }
+
+            // Add Exam Button
+            const addExamBtn = document.getElementById('addExamBtn');
+            if (addExamBtn) {
+                addExamBtn.addEventListener('click', function() {
+                    createModal(
+                        'إضافة امتحان جديد',
+                        `
+                        <form id="examForm">
+                            <div class="form-group">
+                                <label class="form-label">عنوان الامتحان</label>
+                                <input type="text" class="form-input" id="examTitle" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">نوع الامتحان</label>
+                                <select class="form-select" id="examType" required>
+                                    <option value="">اختر النوع</option>
+                                    <option value="true-false">صح/خطأ</option>
+                                    <option value="multiple-choice">اختيار متعدد</option>
+                                    <option value="mixed">مختلط</option>
+                                    <option value="pdf">رفع ملف PDF</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="examFileGroup" style="display: none;">
+                                <label class="form-label">رفع ملف الامتحان (PDF)</label>
+                                <input type="file" class="form-input" id="examFile" accept=".pdf">
+                                <p style="color: #94a3b8; font-size: 0.875rem; margin-top: 0.5rem;">الحد الأقصى: 10 ميجابايت</p>
+                            </div>
+                            <div class="form-group" id="questionsGroup" style="display: none;">
+                                <label class="form-label">عدد الأسئلة</label>
+                                <input type="number" class="form-input" id="examQuestionsCount" min="1" value="10">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">الوصف</label>
+                                <textarea class="form-textarea" id="examDescription"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">المدة (بالدقائق)</label>
+                                <input type="number" class="form-input" id="examDuration" min="1" value="30">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">الدرجة الكاملة</label>
+                                <input type="number" class="form-input" id="examTotalScore" min="1" value="100">
+                            </div>
+                        </form>
+                        `,
+                        (closeModal) => {
+                            const title = document.getElementById('examTitle').value.trim();
+                            const type = document.getElementById('examType').value;
+                            const description = document.getElementById('examDescription').value.trim();
+                            const duration = document.getElementById('examDuration').value;
+                            const totalScore = document.getElementById('examTotalScore').value;
+                            
+                            if (!title || !type) {
+                                showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
+                                return false;
+                            }
+                            
+                            if (type === 'pdf') {
+                                const fileInput = document.getElementById('examFile');
+                                if (!fileInput.files || !fileInput.files[0]) {
+                                    showToast('يرجى اختيار ملف PDF', 'error');
+                                    return false;
+                                }
+                                
+                                const file = fileInput.files[0];
+                                if (file.size > 10 * 1024 * 1024) {
+                                    showToast('حجم الملف كبير جداً (الحد الأقصى 10 ميجابايت)', 'error');
+                                    return false;
+                                }
+                                
+                                return new Promise((resolve) => {
+                                    const reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        const examData = {
+                                            id: Date.now(),
+                                            title,
+                                            type,
+                                            description,
+                                            duration,
+                                            totalScore,
+                                            fileUrl: e.target.result,
+                                            fileName: file.name,
+                                            fileSize: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+                                            questions: [],
+                                            createdAt: new Date().toISOString()
+                                        };
+                                        
+                                        exams.push(examData);
+                                        saveData();
+                                        renderExams();
+                                        updateStats();
+                                        showToast('تم إضافة الامتحان بنجاح!', 'success');
+                                        resolve(true);
+                                    };
+                                    reader.onerror = function() {
+                                        showToast('حدث خطأ أثناء قراءة الملف', 'error');
+                                        resolve(false);
+                                    };
+                                    reader.readAsDataURL(file);
+                                });
+                            } else {
+                                const questionsCount = document.getElementById('examQuestionsCount').value;
+                                const examData = {
+                                    id: Date.now(),
+                                    title,
+                                    type,
+                                    description,
+                                    duration,
+                                    totalScore,
+                                    questionsCount,
+                                    questions: [],
+                                    createdAt: new Date().toISOString()
+                                };
+                                
+                                exams.push(examData);
+                                saveData();
+                                renderExams();
+                                updateStats();
+                                showToast('تم إضافة الامتحان بنجاح!', 'success');
+                                return true;
+                            }
+                        }
+                    );
+                    
+                    // Add event listener for exam type change
+                    setTimeout(() => {
+                        const examTypeSelect = document.getElementById('examType');
+                        const examFileGroup = document.getElementById('examFileGroup');
+                        const questionsGroup = document.getElementById('questionsGroup');
+                        
+                        if (examTypeSelect) {
+                            examTypeSelect.addEventListener('change', function() {
+                                if (this.value === 'pdf') {
+                                    examFileGroup.style.display = 'block';
+                                    questionsGroup.style.display = 'none';
+                                } else if (this.value) {
+                                    examFileGroup.style.display = 'none';
+                                    questionsGroup.style.display = 'block';
+                                } else {
+                                    examFileGroup.style.display = 'none';
+                                    questionsGroup.style.display = 'none';
+                                }
+                            });
+                        }
+                    }, 100);
+                });
+            }
+
+            // Add Note Button
+            const addNoteBtn = document.getElementById('addNoteBtn');
+            if (addNoteBtn) {
+                addNoteBtn.addEventListener('click', function() {
+                    createModal(
+                        'إضافة ملاحظة جديدة',
+                        `
+                        <form id="noteForm">
+                            <div class="form-group">
+                                <label class="form-label">عنوان الملاحظة</label>
+                                <input type="text" class="form-input" id="noteTitle" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">المحتوى</label>
+                                <textarea class="form-textarea" id="noteContent" rows="6" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">الفئة</label>
+                                <select class="form-select" id="noteCategory">
+                                    <option value="general">عام</option>
+                                    <option value="important">مهم</option>
+                                    <option value="exam">متعلق بالامتحان</option>
+                                </select>
+                            </div>
+                        </form>
+                        `,
+                        () => {
+                            const title = document.getElementById('noteTitle').value.trim();
+                            const content = document.getElementById('noteContent').value.trim();
+                            const category = document.getElementById('noteCategory').value;
+                            
+                            if (!title || !content) {
+                                showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
+                                return false;
+                            }
+                            
+                            const newNote = {
+                                id: Date.now(),
+                                title,
+                                content,
+                                category,
+                                createdAt: new Date().toISOString()
+                            };
+                            
+                            notes.push(newNote);
+                            saveData();
+                            renderNotes();
+                            updateStats();
+                            showToast('تم إضافة الملاحظة بنجاح!', 'success');
+                            return true;
+                        }
+                    );
+                });
+            }
+
+            // Add Testimonial Button
+            const addTestimonialBtn = document.getElementById('addTestimonialBtn');
+            if (addTestimonialBtn) {
+                addTestimonialBtn.addEventListener('click', function() {
+                    createModal(
+                        'إضافة رأي طالب',
+                        `
+                        <form id="testimonialForm">
+                            <div class="form-group">
+                                <label class="form-label">اسم الطالب</label>
+                                <input type="text" class="form-input" id="studentName" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">الرأي</label>
+                                <textarea class="form-textarea" id="testimonialComment" rows="4" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">التقييم</label>
+                                <select class="form-select" id="testimonialRating" required>
+                                    <option value="">اختر التقييم</option>
+                                    <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+                                    <option value="4">⭐⭐⭐⭐ (4/5)</option>
+                                    <option value="3">⭐⭐⭐ (3/5)</option>
+                                    <option value="2">⭐⭐ (2/5)</option>
+                                    <option value="1">⭐ (1/5)</option>
+                                </select>
+                            </div>
+                        </form>
+                        `,
+                        () => {
+                            const studentName = document.getElementById('studentName').value.trim();
+                            const comment = document.getElementById('testimonialComment').value.trim();
+                            const rating = document.getElementById('testimonialRating').value;
+                            
+                            if (!studentName || !comment || !rating) {
+                                showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
+                                return false;
+                            }
+                            
+                            const newTestimonial = {
+                                id: Date.now(),
+                                studentName,
+                                comment,
+                                rating: parseInt(rating),
+                                createdAt: new Date().toISOString()
+                            };
+                            
+                            testimonials.push(newTestimonial);
+                            saveData();
+                            renderTestimonials();
+                            showToast('تم إضافة رأي الطالب بنجاح!', 'success');
+                            return true;
+                        }
+                    );
+                });
+            }
+
+            // Add Material Button
+            const addMaterialBtn = document.getElementById('addMaterialBtn');
+            if (addMaterialBtn) {
+                addMaterialBtn.addEventListener('click', function() {
+                    createModal(
+                        'إضافة مذكرة جديدة',
+                        `
+                        <form id="materialForm">
+                            <div class="form-group">
+                                <label class="form-label">عنوان المذكرة</label>
+                                <input type="text" class="form-input" id="materialTitle" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">الصف الدراسي</label>
+                                <select class="form-select" id="materialGrade" required>
+                                    <option value="">اختر الصف</option>
+                                    <option value="1">الصف الأول الثانوي</option>
+                                    <option value="2">الصف الثاني الثانوي</option>
+                                    <option value="3">الصف الثالث الثانوي</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">رفع ملف المذكرة (PDF)</label>
+                                <input type="file" class="form-input" id="materialFile" accept=".pdf" required>
+                                <p style="color: #94a3b8; font-size: 0.875rem; margin-top: 0.5rem;">الحد الأقصى: 10 ميجابايت</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">الوصف</label>
+                                <textarea class="form-textarea" id="materialDescription"></textarea>
+                            </div>
+                        </form>
+                        `,
+                        (closeModal) => {
+                            const title = document.getElementById('materialTitle').value.trim();
+                            const grade = document.getElementById('materialGrade').value;
+                            const description = document.getElementById('materialDescription').value.trim();
+                            const fileInput = document.getElementById('materialFile');
+                            
+                            if (!title || !grade || !fileInput.files || !fileInput.files[0]) {
+                                showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
+                                return false;
+                            }
+                            
+                            const file = fileInput.files[0];
+                            if (file.size > 10 * 1024 * 1024) {
+                                showToast('حجم الملف كبير جداً (الحد الأقصى 10 ميجابايت)', 'error');
+                                return false;
+                            }
+                            
+                            return new Promise((resolve) => {
+                                const reader = new FileReader();
+                                reader.onload = function(e) {
+                                    const newMaterial = {
+                                        id: Date.now(),
+                                        title,
+                                        grade,
+                                        description,
+                                        fileUrl: e.target.result,
+                                        fileName: file.name,
+                                        fileSize: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+                                        createdAt: new Date().toISOString()
+                                    };
+                                    
+                                    materials.push(newMaterial);
+                                    saveData();
+                                    renderMaterials();
+                                    showToast('تم إضافة المذكرة بنجاح!', 'success');
+                                    resolve(true);
+                                };
+                                reader.onerror = function() {
+                                    showToast('حدث خطأ أثناء قراءة الملف', 'error');
+                                    resolve(false);
+                                };
+                                reader.readAsDataURL(file);
+                            });
+                        }
+                    );
+                });
+            }
+
+            // Materials Tabs
+            const materialsTabs = document.querySelectorAll('.materials-tabs .tab-btn');
+            materialsTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    materialsTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const grade = this.getAttribute('data-grade');
+                    document.querySelectorAll('.materials-content').forEach(content => {
+                        content.classList.remove('active');
+                        content.style.display = 'none';
+                    });
+                    const targetContent = document.getElementById(`materialsGrade${grade}`);
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                        targetContent.style.display = 'block';
+                    }
+                });
+            });
+
+            // Render Functions
+            function renderVideos() {
+                const videosList = document.getElementById('videosList');
+                if (!videosList) return;
+                
+                if (videos.length === 0) {
+                    videosList.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 2rem;">لا توجد فيديوهات حالياً</p>';
+                    return;
+                }
+                
+                videosList.innerHTML = videos.map(video => `
+                    <div class="content-item">
+                        <div class="content-item-header">
+                            <h3 class="content-item-title">${video.title}</h3>
+                            <div class="content-item-actions">
+                                <button class="btn btn-sm btn-danger" onclick="deleteVideo(${video.id})">🗑️ حذف</button>
+                            </div>
+                        </div>
+                        <p style="color: #94a3b8; margin-top: 0.5rem;">${video.description || 'لا يوجد وصف'}</p>
+                        <p style="color: #64748b; font-size: 0.875rem; margin-top: 0.5rem;">
+                            ${video.type === 'upload' ? '📁 ملف محلي' : '🔗 YouTube'} | 
+                            المدة: ${video.duration || 'غير محدد'} دقيقة
+                            ${video.fileSize ? ' | الحجم: ' + video.fileSize : ''}
+                        </p>
+                    </div>
+                `).join('');
+            }
+
+            function renderExams() {
+                const examsList = document.getElementById('examsList');
+                if (!examsList) return;
+                
+                if (exams.length === 0) {
+                    examsList.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 2rem;">لا توجد امتحانات حالياً</p>';
+                    return;
+                }
+                
+                const typeLabels = {
+                    'true-false': 'صح/خطأ',
+                    'multiple-choice': 'اختيار متعدد',
+                    'mixed': 'مختلط',
+                    'pdf': 'ملف PDF'
+                };
+                
+                examsList.innerHTML = exams.map(exam => `
+                    <div class="content-item">
+                        <div class="content-item-header">
+                            <h3 class="content-item-title">${exam.title}</h3>
+                            <div class="content-item-actions">
+                                ${exam.fileUrl ? `<button class="btn btn-sm" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3);" onclick="window.open('${exam.fileUrl}', '_blank')">📄 عرض</button>` : ''}
+                                <button class="btn btn-sm btn-danger" onclick="deleteExam(${exam.id})">🗑️ حذف</button>
+                            </div>
+                        </div>
+                        <p style="color: #94a3b8; margin-top: 0.5rem;">${exam.description || 'لا يوجد وصف'}</p>
+                        <p style="color: #64748b; font-size: 0.875rem; margin-top: 0.5rem;">
+                            النوع: ${typeLabels[exam.type]} | المدة: ${exam.duration} دقيقة | الدرجة: ${exam.totalScore || 100}
+                            ${exam.fileSize ? ' | الحجم: ' + exam.fileSize : ''}
+                        </p>
+                    </div>
+                `).join('');
+            }
+
+            function renderNotes() {
+                const notesList = document.getElementById('notesList');
+                if (!notesList) return;
+                
+                if (notes.length === 0) {
+                    notesList.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 2rem;">لا توجد ملاحظات حالياً</p>';
+                    return;
+                }
+                
+                const categoryLabels = {
+                    'general': 'عام',
+                    'important': 'مهم',
+                    'exam': 'متعلق بالامتحان'
+                };
+                
+                notesList.innerHTML = notes.map(note => `
+                    <div class="content-item">
+                        <div class="content-item-header">
+                            <h3 class="content-item-title">${note.title}</h3>
+                            <div class="content-item-actions">
+                                <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.id})">🗑️ حذف</button>
+                            </div>
+                        </div>
+                        <p style="color: #94a3b8; margin-top: 0.5rem;">${note.content}</p>
+                        <p style="color: #64748b; font-size: 0.875rem; margin-top: 0.5rem;">الفئة: ${categoryLabels[note.category]}</p>
+                    </div>
+                `).join('');
+            }
+
+            function renderTestimonials() {
+                const testimonialsList = document.getElementById('testimonialsList');
+                if (!testimonialsList) return;
+                
+                if (testimonials.length === 0) {
+                    testimonialsList.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 2rem;">لا توجد آراء حالياً</p>';
+                    return;
+                }
+                
+                testimonialsList.innerHTML = testimonials.map(testimonial => `
+                    <div class="content-item">
+                        <div class="content-item-header">
+                            <h3 class="content-item-title">${testimonial.studentName}</h3>
+                            <div class="content-item-actions">
+                                <button class="btn btn-sm btn-danger" onclick="deleteTestimonial(${testimonial.id})">🗑️ حذف</button>
+                            </div>
+                        </div>
+                        <p style="color: #94a3b8; margin-top: 0.5rem;">${testimonial.comment}</p>
+                        <p style="color: #fbbf24; font-size: 1.2rem; margin-top: 0.5rem;">${'⭐'.repeat(testimonial.rating)}</p>
+                    </div>
+                `).join('');
+            }
+
+            function renderMaterials() {
+                const gradeLabels = {
+                    '1': 'الصف الأول الثانوي',
+                    '2': 'الصف الثاني الثانوي',
+                    '3': 'الصف الثالث الثانوي'
+                };
+                
+                ['1', '2', '3'].forEach(grade => {
+                    const container = document.getElementById(`materialsGrade${grade}`);
+                    if (!container) return;
+                    
+                    const gradeMaterials = materials.filter(m => m.grade === grade);
+                    
+                    if (gradeMaterials.length === 0) {
+                        container.innerHTML = `<p style="text-align: center; color: #94a3b8; padding: 2rem;">لا توجد مذكرات لـ ${gradeLabels[grade]}</p>`;
+                        return;
+                    }
+                    
+                    container.innerHTML = gradeMaterials.map(material => `
+                        <div class="content-item">
+                            <div class="content-item-header">
+                                <h3 class="content-item-title">📚 ${material.title}</h3>
+                                <div class="content-item-actions">
+                                    <button class="btn btn-sm" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3);" onclick="window.open('${material.fileUrl}', '_blank')">📄 عرض</button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteMaterial(${material.id})">🗑️ حذف</button>
+                                </div>
+                            </div>
+                            <p style="color: #94a3b8; margin-top: 0.5rem;">${material.description || 'لا يوجد وصف'}</p>
+                            <p style="color: #64748b; font-size: 0.875rem; margin-top: 0.5rem;">
+                                الصف: ${gradeLabels[material.grade]} | الحجم: ${material.fileSize}
+                            </p>
+                        </div>
+                    `).join('');
+                });
+            }
+
+            function updateStats() {
+                document.getElementById('totalVideos').textContent = videos.length;
+                document.getElementById('totalExams').textContent = exams.length;
+                document.getElementById('totalNotes').textContent = notes.length;
+                document.getElementById('totalStudents').textContent = '0'; // يمكن تحديثه لاحقاً
+            }
+
+            // Delete Functions
+            window.deleteVideo = function(id) {
+                createConfirmModal(
+                    'حذف الفيديو',
+                    'هل أنت متأكد من حذف هذا الفيديو؟',
+                    () => {
+                        videos = videos.filter(v => v.id !== id);
+                        saveData();
+                        renderVideos();
+                        updateStats();
+                        showToast('تم حذف الفيديو بنجاح!', 'success');
+                    }
+                );
+            };
+
+            window.deleteExam = function(id) {
+                createConfirmModal(
+                    'حذف الامتحان',
+                    'هل أنت متأكد من حذف هذا الامتحان؟',
+                    () => {
+                        exams = exams.filter(e => e.id !== id);
+                        saveData();
+                        renderExams();
+                        updateStats();
+                        showToast('تم حذف الامتحان بنجاح!', 'success');
+                    }
+                );
+            };
+
+            window.deleteNote = function(id) {
+                createConfirmModal(
+                    'حذف الملاحظة',
+                    'هل أنت متأكد من حذف هذه الملاحظة؟',
+                    () => {
+                        notes = notes.filter(n => n.id !== id);
+                        saveData();
+                        renderNotes();
+                        updateStats();
+                        showToast('تم حذف الملاحظة بنجاح!', 'success');
+                    }
+                );
+            };
+
+            window.deleteTestimonial = function(id) {
+                createConfirmModal(
+                    'حذف الرأي',
+                    'هل أنت متأكد من حذف هذا الرأي؟',
+                    () => {
+                        testimonials = testimonials.filter(t => t.id !== id);
+                        saveData();
+                        renderTestimonials();
+                        showToast('تم حذف الرأي بنجاح!', 'success');
+                    }
+                );
+            };
+
+            // Motivational Messages Management
+            let motivationalMessages = JSON.parse(localStorage.getItem('motivationalMessages') || '[]');
+            
+            // Initialize with default messages if empty
+            if (motivationalMessages.length === 0) {
+                motivationalMessages = [
+                    { id: 1, message: "النجاح ليس نهاية المطاف، والفشل ليس قاتلاً، إنما الشجاعة للاستمرار هي ما يهم" },
+                    { id: 2, message: "التعليم هو السلاح الأقوى الذي يمكنك استخدامه لتغيير العالم" },
+                    { id: 3, message: "لا تدع ما لا تستطيع فعله يتعارض مع ما تستطيع فعله" },
+                    { id: 4, message: "المستقبل ينتمي لأولئك الذين يؤمنون بجمال أحلامهم" },
+                    { id: 5, message: "التعلم رحلة وليس وجهة، استمتع بكل خطوة في طريقك" },
+                    { id: 6, message: "العقل ليس وعاءً يُملأ، بل ناراً تُشعل" },
+                    { id: 7, message: "كل إنجاز عظيم بدأ بقرار المحاولة" },
+                    { id: 8, message: "الطريق إلى النجاح دائماً قيد الإنشاء" },
+                    { id: 9, message: "التعليم هو جواز السفر إلى المستقبل" },
+                    { id: 10, message: "لا تتوقف عن التعلم، فالحياة لا تتوقف عن التعليم" },
+                    { id: 11, message: "النجاح هو مجموع الجهود الصغيرة المتكررة يوماً بعد يوم" },
+                    { id: 12, message: "أنت أقوى مما تعتقد وأذكى مما تظن" },
+                    { id: 13, message: "كل يوم هو فرصة جديدة للتعلم والنمو" },
+                    { id: 14, message: "الفشل هو مجرد فرصة للبدء من جديد بذكاء أكبر" },
+                    { id: 15, message: "اجعل اليوم أفضل من الأمس وغداً أفضل من اليوم" }
+                ];
+                localStorage.setItem('motivationalMessages', JSON.stringify(motivationalMessages));
+            }
+
+            function saveMotivationalMessages() {
+                localStorage.setItem('motivationalMessages', JSON.stringify(motivationalMessages));
+                // Update JSON file data in localStorage for compatibility
+                const jsonData = {
+                    messages: motivationalMessages.map(m => m.message)
+                };
+                // This will be used by the footer and toast system
+                localStorage.setItem('motivationalMessagesData', JSON.stringify(jsonData));
+            }
+
+            function renderMotivationalMessages() {
+                const motivationalList = document.getElementById('motivationalList');
+                if (!motivationalList) return;
+                
+                if (motivationalMessages.length === 0) {
+                    motivationalList.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 2rem;">لا توجد رسائل تحفيزية حالياً</p>';
+                    return;
+                }
+                
+                motivationalList.innerHTML = motivationalMessages.map(msg => `
+                    <div class="content-item" style="background: rgba(139, 92, 246, 0.05); border-color: rgba(139, 92, 246, 0.3);">
+                        <div class="content-item-header">
+                            <h3 class="content-item-title" style="color: #8b5cf6;">💬 ${msg.message}</h3>
+                            <div class="content-item-actions">
+                                <button class="btn btn-sm btn-danger" onclick="deleteMotivationalMessage(${msg.id})">🗑️ حذف</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            window.deleteMotivationalMessage = function(id) {
+                createConfirmModal(
+                    'حذف الرسالة',
+                    'هل أنت متأكد من حذف هذه الرسالة التحفيزية؟',
+                    () => {
+                        motivationalMessages = motivationalMessages.filter(m => m.id !== id);
+                        saveMotivationalMessages();
+                        renderMotivationalMessages();
+                        showToast('تم حذف الرسالة بنجاح!', 'success');
+                    }
+                );
+            };
+
+            // Add Motivational Message Button
+            const addMotivationalBtn = document.getElementById('addMotivationalBtn');
+            if (addMotivationalBtn) {
+                addMotivationalBtn.addEventListener('click', function() {
+                    const modal = document.createElement('div');
+                    modal.className = 'modal-overlay active';
+                    modal.style.cssText = 'display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; align-items: center; justify-content: center;';
+                    modal.innerHTML = `
+                        <div style="background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(20px); border: 2px solid rgba(139, 92, 246, 0.5); border-radius: 20px; padding: 2rem; max-width: 600px; width: 90%; box-shadow: 0 20px 60px rgba(139, 92, 246, 0.3);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                                <h2 style="font-size: 1.5rem; color: #8b5cf6;">✨ إضافة رسالة تحفيزية جديدة</h2>
+                                <button class="modal-close" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">✕</button>
+                            </div>
+                            <div style="margin-bottom: 1.5rem;">
+                                <label style="display: block; margin-bottom: 0.5rem; color: #f1f5f9; font-weight: 500;">نص الرسالة</label>
+                                <textarea id="messageInput" rows="4" style="width: 100%; padding: 1rem; background: rgba(15, 23, 42, 0.6); border: 2px solid rgba(139, 92, 246, 0.3); border-radius: 12px; color: #f1f5f9; font-size: 1rem; resize: vertical; box-sizing: border-box;" placeholder="اكتب رسالة تحفيزية للطلاب..."></textarea>
+                            </div>
+                            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                                <button class="modal-cancel" style="padding: 0.75rem 1.5rem; background: rgba(148, 163, 184, 0.2); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 12px; font-weight: 600; cursor: pointer;">إلغاء</button>
+                                <button class="modal-submit" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #8b5cf6, #a855f7); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer;">حفظ</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(modal);
+                    
+                    const closeBtn = modal.querySelector('.modal-close');
+                    const cancelBtn = modal.querySelector('.modal-cancel');
+                    const submitBtn = modal.querySelector('.modal-submit');
+                    const messageInput = modal.querySelector('#messageInput');
+                    
+                    function closeModal() {
+                        modal.style.display = 'none';
+                        setTimeout(() => modal.remove(), 300);
+                    }
+                    
+                    closeBtn.addEventListener('click', closeModal);
+                    cancelBtn.addEventListener('click', closeModal);
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) closeModal();
+                    });
+                    
+                    submitBtn.addEventListener('click', () => {
+                        const message = messageInput.value.trim();
+                        
+                        if (!message) {
+                            showToast('يرجى إدخال نص الرسالة', 'error');
+                            return;
+                        }
+                        
+                        const newMessage = {
+                            id: Date.now(),
+                            message: message
+                        };
+                        
+                        motivationalMessages.push(newMessage);
+                        saveMotivationalMessages();
+                        renderMotivationalMessages();
+                        showToast('تم إضافة الرسالة بنجاح!', 'success');
+                        closeModal();
+                    });
+                    
+                    messageInput.focus();
+                });
+            }
+
+            window.deleteTestimonial = function(id) {
+                createConfirmModal(
+                    'حذف الرأي',
+                    'هل أنت متأكد من حذف هذا الرأي؟',
+                    () => {
+                        testimonials = testimonials.filter(t => t.id !== id);
+                        saveData();
+                        renderTestimonials();
+                        showToast('تم حذف الرأي بنجاح!', 'success');
+                    }
+                );
+            };
+
+            window.deleteMaterial = function(id) {
+                createConfirmModal(
+                    'حذف المذكرة',
+                    'هل أنت متأكد من حذف هذه المذكرة؟',
+                    () => {
+                        materials = materials.filter(m => m.id !== id);
+                        saveData();
+                        renderMaterials();
+                        showToast('تم حذف المذكرة بنجاح!', 'success');
+                    }
+                );
+            };
+
+            // Initial Load
+            updateStats();
+            renderVideos();
+            renderExams();
+            renderNotes();
+            renderTestimonials();
+            renderMaterials();
+            renderMotivationalMessages();
+            
+            // Load user info
+            document.getElementById('userName').textContent = 'المدرس محمد ناصر';
+
+            // Debug Panel
+            const debugToggle = document.getElementById('debugToggle');
+            const debugPanel = document.getElementById('debugPanel');
+            const debugRefresh = document.getElementById('debugRefresh');
+            const debugClear = document.getElementById('debugClear');
+
+            function updateDebugPanel() {
+                document.getElementById('debugVideos').textContent = videos.length;
+                document.getElementById('debugExams').textContent = exams.length;
+                document.getElementById('debugNotes').textContent = notes.length;
+                document.getElementById('debugMaterials').textContent = materials.length;
+                
+                const totalSize = (
+                    JSON.stringify(videos).length +
+                    JSON.stringify(exams).length +
+                    JSON.stringify(notes).length +
+                    JSON.stringify(materials).length +
+                    JSON.stringify(testimonials).length
+                ) / 1024;
+                
+                document.getElementById('debugSize').textContent = totalSize.toFixed(2) + ' KB';
+            }
+
+            debugToggle.addEventListener('click', () => {
+                debugPanel.classList.toggle('active');
+                if (debugPanel.classList.contains('active')) {
+                    updateDebugPanel();
+                }
+            });
+
+            debugRefresh.addEventListener('click', () => {
+                updateDebugPanel();
+                showToast('تم تحديث البيانات!', 'success');
+            });
+
+            debugClear.addEventListener('click', () => {
+                createConfirmModal(
+                    'مسح جميع البيانات',
+                    'هل أنت متأكد من مسح جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه!',
+                    () => {
+                        localStorage.clear();
+                        videos = [];
+                        exams = [];
+                        notes = [];
+                        materials = [];
+                        testimonials = [];
+                        updateStats();
+                        renderVideos();
+                        renderExams();
+                        renderNotes();
+                        renderTestimonials();
+                        renderMaterials();
+                        updateDebugPanel();
+                        showToast('تم مسح جميع البيانات!', 'success');
+                    }
+                );
+            });
+
+            // Update debug panel every 5 seconds
+            setInterval(() => {
+                if (debugPanel.classList.contains('active')) {
+                    updateDebugPanel();
+                }
+            }, 5000);
+
+            // Log initial state
+            console.log('=== DASHBOARD LOADED ===');
+            console.log('Videos:', videos.length);
+            console.log('Exams:', exams.length);
+            console.log('Notes:', notes.length);
+            console.log('Materials:', materials.length);
+            console.log('Testimonials:', testimonials.length);
+            console.log('========================');
+        });
+    </script>
+</body>
+</html>

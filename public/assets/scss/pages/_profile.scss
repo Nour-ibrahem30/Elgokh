@@ -1,0 +1,146 @@
+// Profile Page Styles
+
+.profile {
+  padding: $spacing-xl;
+}
+
+.profile-header {
+  @include card;
+  @include flex-center;
+  gap: $spacing-xl;
+  margin-bottom: $spacing-2xl;
+  
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: $radius-full;
+  @include gradient-primary;
+  @include flex-center;
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-name {
+  font-size: $font-size-3xl;
+  margin-bottom: $spacing-sm;
+}
+
+.profile-email {
+  color: $text-secondary;
+  margin-bottom: $spacing-md;
+}
+
+.profile-stats {
+  @include flex-center;
+  gap: $spacing-xl;
+  
+  @media (max-width: $breakpoint-sm) {
+    flex-direction: column;
+  }
+}
+
+.profile-stat {
+  text-align: center;
+  
+  .stat-number {
+    font-size: $font-size-2xl;
+    font-weight: bold;
+    @include gradient-text;
+  }
+  
+  .stat-label {
+    color: $text-secondary;
+    font-size: $font-size-sm;
+  }
+}
+
+// Todo List
+.todo-section {
+  @include card;
+  margin-bottom: $spacing-2xl;
+}
+
+.todo-header {
+  @include flex-between;
+  margin-bottom: $spacing-lg;
+}
+
+.todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.todo-item {
+  @include flex-between;
+  padding: $spacing-md;
+  background: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  transition: all $transition-base;
+  
+  &:hover {
+    border-color: $accent-primary;
+  }
+  
+  &.completed {
+    opacity: 0.6;
+    
+    .todo-title {
+      text-decoration: line-through;
+    }
+  }
+}
+
+.todo-content {
+  flex: 1;
+}
+
+.todo-title {
+  font-weight: 600;
+  margin-bottom: $spacing-xs;
+}
+
+.todo-meta {
+  @include flex-center;
+  gap: $spacing-md;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.todo-priority {
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  
+  &.high {
+    background: rgba($accent-danger, 0.2);
+    color: $accent-danger;
+  }
+  
+  &.medium {
+    background: rgba($accent-warning, 0.2);
+    color: $accent-warning;
+  }
+  
+  &.low {
+    background: rgba($accent-success, 0.2);
+    color: $accent-success;
+  }
+}
+
+.todo-actions {
+  @include flex-center;
+  gap: $spacing-sm;
+}

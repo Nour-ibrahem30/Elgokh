@@ -1,0 +1,113 @@
+// Variables & Mixins
+@import 'variables';
+@import 'mixins';
+
+// Base Styles
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: $font-family;
+  background: $bg-primary;
+  color: $text-primary;
+  direction: rtl;
+  min-height: 100vh;
+  line-height: 1.6;
+  @include custom-scrollbar;
+}
+
+// Typography
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: $spacing-md;
+}
+
+h1 { font-size: $font-size-4xl; }
+h2 { font-size: $font-size-3xl; }
+h3 { font-size: $font-size-2xl; }
+h4 { font-size: $font-size-xl; }
+h5 { font-size: $font-size-lg; }
+h6 { font-size: $font-size-base; }
+
+p {
+  margin-bottom: $spacing-md;
+}
+
+a {
+  color: $accent-primary;
+  text-decoration: none;
+  transition: color $transition-base;
+  
+  &:hover {
+    color: $accent-secondary;
+  }
+}
+
+// Utility Classes
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 $spacing-xl;
+}
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.mt-1 { margin-top: $spacing-sm; }
+.mt-2 { margin-top: $spacing-md; }
+.mt-3 { margin-top: $spacing-lg; }
+.mt-4 { margin-top: $spacing-xl; }
+
+.mb-1 { margin-bottom: $spacing-sm; }
+.mb-2 { margin-bottom: $spacing-md; }
+.mb-3 { margin-bottom: $spacing-lg; }
+.mb-4 { margin-bottom: $spacing-xl; }
+
+.sr-only { @include sr-only; }
+
+// Loading
+.loading {
+  @include flex-center;
+  padding: $spacing-3xl;
+  color: $text-secondary;
+}
+
+.spinner {
+  border: 3px solid $bg-hover;
+  border-top: 3px solid $accent-primary;
+  border-radius: $radius-full;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto $spacing-md;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Import Components
+@import 'components/animations';
+@import 'components/buttons';
+@import 'components/cards';
+@import 'components/forms';
+@import 'components/modal';
+
+// Import Layout
+@import 'layout/header';
+@import 'layout/footer';
+
+// Import Pages
+@import 'pages/home';
+@import 'pages/dashboard';
+@import 'pages/profile';

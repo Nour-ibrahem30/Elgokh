@@ -1,0 +1,123 @@
+// Card Styles
+.card {
+  @include card;
+  
+  &:hover {
+    @include card-hover;
+  }
+}
+
+.card-header {
+  @include flex-between;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid $border-color;
+}
+
+.card-title {
+  font-size: $font-size-xl;
+  font-weight: 600;
+  margin: 0;
+}
+
+.card-body {
+  color: $text-secondary;
+  line-height: 1.8;
+}
+
+.card-footer {
+  @include flex-between;
+  margin-top: $spacing-lg;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border-color;
+}
+
+.card-actions {
+  @include flex-center;
+  gap: $spacing-sm;
+}
+
+// Feature Card
+.feature-card {
+  @include card;
+  text-align: center;
+  
+  &:hover {
+    @include card-hover;
+  }
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: $spacing-lg;
+}
+
+.feature-title {
+  font-size: $font-size-xl;
+  margin-bottom: $spacing-md;
+}
+
+.feature-description {
+  color: $text-secondary;
+  line-height: 1.8;
+}
+
+// Testimonial Card
+.testimonial-card {
+  @include card;
+  
+  &:hover {
+    @include card-hover;
+  }
+}
+
+.testimonial-header {
+  @include flex-center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.testimonial-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: $radius-full;
+  @include gradient-primary;
+  @include flex-center;
+  font-size: $font-size-2xl;
+  flex-shrink: 0;
+}
+
+.testimonial-info {
+  flex: 1;
+  text-align: right;
+}
+
+.testimonial-name {
+  font-size: $font-size-lg;
+  font-weight: 600;
+  margin-bottom: $spacing-xs;
+}
+
+.testimonial-role {
+  color: $text-secondary;
+  font-size: $font-size-sm;
+}
+
+.testimonial-rating {
+  @include flex-center;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+  color: $accent-warning;
+}
+
+.testimonial-text {
+  color: $text-secondary;
+  line-height: 1.8;
+}
+
+.testimonial-date {
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  margin-top: $spacing-md;
+  text-align: left;
+}

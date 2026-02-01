@@ -1,0 +1,194 @@
+// Dashboard Page Styles
+
+.dashboard {
+  padding: $spacing-xl;
+}
+
+.dashboard-header {
+  @include flex-between;
+  margin-bottom: $spacing-2xl;
+  
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+}
+
+.dashboard-title {
+  font-size: $font-size-3xl;
+  @include gradient-text;
+}
+
+.dashboard-actions {
+  @include flex-center;
+  gap: $spacing-md;
+}
+
+// Stats Grid
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: $spacing-lg;
+  margin-bottom: $spacing-2xl;
+}
+
+.stat-card {
+  @include card;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    @include gradient-primary;
+  }
+  
+  &:hover {
+    @include card-hover;
+  }
+}
+
+.stat-header {
+  @include flex-between;
+  margin-bottom: $spacing-md;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-lg;
+  @include gradient-primary;
+  @include flex-center;
+  font-size: $font-size-2xl;
+}
+
+.stat-number {
+  font-size: $font-size-3xl;
+  font-weight: bold;
+  @include gradient-text;
+}
+
+.stat-label {
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  margin-top: $spacing-sm;
+}
+
+// Dashboard Grid
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: $spacing-xl;
+  
+  @media (max-width: $breakpoint-lg) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Progress Section
+.progress-section {
+  @include card;
+  margin-bottom: $spacing-xl;
+}
+
+.section-header {
+  @include flex-between;
+  margin-bottom: $spacing-lg;
+}
+
+.section-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: $radius-md;
+  @include gradient-primary;
+  @include flex-center;
+}
+
+// Progress Item
+.progress-item {
+  background: $bg-secondary;
+  padding: $spacing-lg;
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-md;
+  border: 1px solid $border-color;
+  transition: all $transition-base;
+  
+  &:hover {
+    border-color: $accent-primary;
+    transform: translateX(-4px);
+  }
+}
+
+.progress-header {
+  @include flex-between;
+  margin-bottom: $spacing-md;
+}
+
+.progress-title {
+  font-size: $font-size-lg;
+  font-weight: 600;
+}
+
+.progress-percentage {
+  font-size: $font-size-xl;
+  font-weight: bold;
+  color: $accent-success;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background: $bg-hover;
+  border-radius: $radius-full;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  @include gradient-primary;
+  border-radius: $radius-full;
+  transition: width 0.5s ease;
+}
+
+.progress-details {
+  @include flex-center;
+  gap: $spacing-xl;
+  margin-top: $spacing-md;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+}
+
+// Quick Actions
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $spacing-md;
+}
+
+.action-btn {
+  @include card;
+  @include flex-column;
+  align-items: center;
+  gap: $spacing-md;
+  text-decoration: none;
+  color: $text-primary;
+  text-align: center;
+  padding: $spacing-lg;
+  
+  &:hover {
+    @include card-hover;
+  }
+}
+
+.action-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: $radius-lg;
+  @include gradient-primary;
+  @include flex-center;
+  font-size: $font-size-3xl;
+}

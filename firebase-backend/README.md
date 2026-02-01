@@ -1,36 +1,112 @@
-# Firebase Backend (clean scaffold)
+# 🔥 Firebase Backend - Educational Platform
 
-This folder contains an example backend scaffold using Firebase Admin SDK, Firestore, Realtime Database and sample Cloud Functions.
+Clean, scalable backend using Firebase (Free Spark Plan)
 
-Key features:
-- Express server with authenticated endpoints (verify Firebase ID token)
-- Firestore service module (courses, lessons, assignments, exams, notes, feedback)
-- Realtime Database service module (progress, notifications, liveChat)
-- Cloud Function examples: `onUserCreate` and `onNoteCreate`
-- Firestore and Realtime Database security rules
+## 🚀 Quick Start
 
-Setup (local server)
-
-1. Install dependencies:
-
+### 1. Install Dependencies
 ```bash
-cd firebase-backend
 npm install
 ```
 
-2. Set environment variables (recommended):
+### 2. Configure Firebase
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Create a new project
+3. Enable Authentication (Email/Password + Google)
+4. Enable Firestore Database
+5. Enable Realtime Database
+6. Copy your config to `.env` file
 
-- `GOOGLE_APPLICATION_CREDENTIALS` -> path to service account JSON (for admin SDK)
-- `FIREBASE_DATABASE_URL` -> your RTDB URL (e.g. https://<project>.firebaseio.com)
-- `PORT` -> optional
-
-3. Run server:
-
+### 3. Setup Environment
 ```bash
-npm start
+cp .env.example .env
+# Edit .env with your Firebase credentials
 ```
 
-Cloud Functions:
-- Example functions are in `functions/index.js`. Deploy with `firebase deploy --only functions` from the root of your Firebase project.
+### 4. Run the Server
+```bash
+npm start
+# or for development
+npm run dev
+```
 
-Security rules are in `security/`.
+## 📁 Project Structure
+
+```
+firebase-backend/
+├── src/
+│   ├── config/
+│   │   └── firebase.js          # Firebase initialization
+│   ├── services/
+│   │   ├── auth.service.js      # Authentication logic
+│   │   ├── firestore.service.js # Firestore operations
+│   │   └── realtime.service.js  # Realtime DB operations
+│   ├── controllers/
+│   │   ├── user.controller.js   # User management
+│   │   ├── course.controller.js # Course operations
+│   │   ├── lesson.controller.js # Lesson management
+│   │   └── note.controller.js   # Teacher notes
+│   ├── routes/
+│   │   └── api.routes.js        # API endpoints
+│   ├── middleware/
+│   │   └── auth.middleware.js   # Auth verification
+│   ├── utils/
+│   │   └── helpers.js           # Helper functions
+│   └── index.js                 # Entry point
+├── security-rules/
+│   ├── firestore.rules          # Firestore security
+│   └── database.rules.json      # Realtime DB security
+└── package.json
+```
+
+## 🔐 Security Rules
+
+Security rules are automatically configured for:
+- ✅ Only authenticated users can access data
+- ✅ Students cannot create/edit courses, lessons, exams
+- ✅ Teachers have full CRUD permissions
+- ✅ Notes are automatically visible to course students
+
+## 📊 Database Structure
+
+### Firestore Collections:
+- `users` - User profiles and roles
+- `courses` - Course information
+- `lessons` - Course lessons with external video links
+- `assignments` - Student assignments
+- `exams` - Exams and quizzes
+- `notes` - Teacher notes (auto-created)
+- `feedback` - Student feedback
+
+### Realtime Database Nodes:
+- `progress` - Student progress tracking
+- `notifications` - Real-time notifications
+- `liveChat` - Course chat rooms
+
+## 🎯 Features
+
+- ✅ Email/Password & Google Authentication
+- ✅ Role-based access (student/teacher)
+- ✅ Auto-create Firestore documents
+- ✅ Real-time progress tracking
+- ✅ Live notifications
+- ✅ Teacher notes auto-sync
+- ✅ External video links (YouTube, Vimeo, Drive)
+- ✅ Clean code architecture
+- ✅ Scalable structure
+
+## 📝 API Examples
+
+See `src/test/testFunctions.js` for usage examples.
+
+## 🌐 Deploy
+
+Ready to deploy on:
+- Vercel
+- Railway
+- Render
+- Any Node.js hosting
+
+---
+
+**Built with Clean Code principles for scalability and maintainability**

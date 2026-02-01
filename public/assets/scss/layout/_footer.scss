@@ -1,0 +1,45 @@
+// Footer Styles
+.footer {
+  background: $bg-secondary;
+  border-top: 1px solid $border-color;
+  padding: $spacing-3xl $spacing-xl;
+  margin-top: $spacing-3xl;
+}
+
+.footer-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  @include flex-between;
+  gap: $spacing-xl;
+  
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.footer-text {
+  color: $text-secondary;
+  margin: 0;
+}
+
+.footer-nav {
+  @include flex-center;
+  gap: $spacing-lg;
+  
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column;
+  }
+  
+  a {
+    color: $text-secondary;
+    text-decoration: none;
+    transition: color $transition-base;
+    
+    &:hover {
+      color: $accent-primary;
+    }
+    
+    @include focus-visible;
+  }
+}

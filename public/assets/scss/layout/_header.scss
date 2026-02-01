@@ -1,0 +1,108 @@
+// Header Styles
+.header {
+  background: $bg-secondary;
+  border-bottom: 1px solid $border-color;
+  padding: $spacing-md $spacing-xl;
+  position: sticky;
+  top: 0;
+  z-index: $z-sticky;
+  backdrop-filter: blur(10px);
+  
+  &.scrolled {
+    background: rgba($bg-secondary, 0.95);
+    box-shadow: $shadow-md;
+  }
+}
+
+.navbar {
+  @include flex-between;
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: $spacing-xl;
+  
+  @media (max-width: $breakpoint-md) {
+    flex-wrap: wrap;
+  }
+}
+
+.navbar-brand {
+  flex-shrink: 0;
+}
+
+.logo {
+  @include flex-center;
+  gap: $spacing-sm;
+  font-size: $font-size-2xl;
+  font-weight: bold;
+  @include gradient-text;
+  text-decoration: none;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.logo-icon {
+  font-size: $font-size-3xl;
+}
+
+.navbar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: $text-primary;
+  font-size: $font-size-2xl;
+  cursor: pointer;
+  padding: $spacing-sm;
+  
+  @media (max-width: $breakpoint-md) {
+    display: block;
+  }
+  
+  @include focus-visible;
+}
+
+.navbar-menu {
+  @include flex-between;
+  flex: 1;
+  gap: $spacing-xl;
+  
+  @media (max-width: $breakpoint-md) {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    
+    &.active {
+      display: flex;
+    }
+  }
+}
+
+.navbar-nav {
+  @include flex-center;
+  gap: $spacing-lg;
+  list-style: none;
+  
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  a {
+    color: $text-primary;
+    text-decoration: none;
+    padding: $spacing-sm $spacing-md;
+    border-radius: $radius-md;
+    transition: all $transition-base;
+    font-weight: 500;
+    
+    &:hover,
+    &[aria-current="page"] {
+      color: $accent-primary;
+      background: $bg-hover;
+    }
+    
+    @include focus-visible;
+  }
+}

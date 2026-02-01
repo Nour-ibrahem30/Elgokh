@@ -1,19 +1,15 @@
 {
   "version": 2,
-  "name": "philosopher-platform",
   "builds": [
     {
-      "src": "server-production.js",
+      "src": "server.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/server-production.js"
+      "dest": "server.js"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
