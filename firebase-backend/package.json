@@ -7,7 +7,12 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "node src/test/testFunctions.js"
+    "test": "node src/test/testFunctions.js",
+    "setup-firebase": "node setupFirebase.js",
+    "create-teacher": "node src/createUsers.js",
+    "seed-basic": "node src/seedBasicData.js",
+    "seed-database": "node src/seedDatabase_updated.js",
+    "seed-with-admin": "node src/seedWithAdmin.js"
   },
   "keywords": [
     "firebase",
@@ -19,11 +24,11 @@
   "author": "Philosopher Platform",
   "license": "MIT",
   "dependencies": {
-    "firebase": "^10.7.1",
-    "firebase-admin": "^12.0.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "firebase": "^10.7.1",
+    "firebase-admin": "^12.7.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

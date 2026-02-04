@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, collection, getDocs, query, orderBy, doc, setDoc, getDoc } from 'firebase/firestore';
 import { firebaseConfig } from './firebase-config';
+import './toast-types';
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -68,8 +69,10 @@ function createExamCard(exam) {
 }
 async function handleStartExam(exam) {
     if (!currentUser) {
-        alert('يجب تسجيل الدخول لبدء الامتحان');
-        window.location.href = '/login.html';
+        window.showToast('يجب تسجيل الدخول لبدء الامتحان', 'warning');
+        setTimeout(() => {
+            window.location.href = '/login.html';
+        }, 2000);
         return;
     }
     currentExam = exam;
@@ -198,14 +201,18 @@ async function handleSubmitExam(exam, form) {
     }
     catch (error) {
         console.error('Error saving exam result:', error);
-        alert('حدث خطأ أثناء حفظ النتيجة');
+        window.showToast('حدث خطأ أثناء حفظ النتيجة', 'error');
     }
 }
 function autoSubmitExam() {
     const form = document.getElementById('examForm');
     if (form && currentExam) {
-        alert('انتهى الوقت! سيتم إرسال إجاباتك تلقائياً');
-        handleSubmitExam(currentExam, form);
+        window.showToast('انتهى الوقت! سيتم إرسال إجاباتك تلقائياً', 'warning', 3000);
+        setTimeout(() => {
+            if (currentExam) {
+                handleSubmitExam(currentExam, form);
+            }
+        }, 1000);
     }
 }
 function showResultModal(result, exam) {

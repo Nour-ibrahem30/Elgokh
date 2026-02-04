@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { getFirestore, collection, getDocs, deleteDoc, doc, query, where, orderBy, getDoc } from 'firebase/firestore';
 import { firebaseConfig } from './firebase-config';
+import './toast-types';
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -251,7 +252,7 @@ async function handleDelete(id, type) {
     }
     catch (error) {
         console.error('Error deleting:', error);
-        alert('حدث خطأ أثناء الحذف');
+        window.showToast('حدث خطأ أثناء الحذف', 'error');
     }
 }
 sidebarLinks.forEach(link => {

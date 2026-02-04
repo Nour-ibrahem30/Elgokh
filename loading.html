@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جاري التحميل | منصة التعلم</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        #loading-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        .loading-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 2rem;
+        }
+        .loading-logo {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        .loading-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .loading-subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+        .loading-bar {
+            width: 280px;
+            height: 6px;
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 10px;
+            margin: 0 auto 1.5rem;
+            overflow: hidden;
+        }
+        .loading-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            animation: loadBar 2.5s ease-in-out forwards;
+        }
+        @keyframes loadBar {
+            to { width: 100%; }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.9; }
+        }
+        .loading-hint {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+        .btn-skip {
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(59, 130, 246, 0.2);
+            border: 2px solid rgba(59, 130, 246, 0.5);
+            border-radius: 12px;
+            color: #3b82f6;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .btn-skip:hover {
+            background: rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="loading-canvas"></canvas>
+    <div class="loading-content">
+        <div class="loading-logo">🎓</div>
+        <h1 class="loading-title">منصة التعلم</h1>
+        <p class="loading-subtitle" id="loadingText">جاري تجهيز رحلتك التعليمية...</p>
+        <div class="loading-bar">
+            <div class="loading-bar-fill" id="loadingBarFill"></div>
+        </div>
+        <p class="loading-hint">استمتع بتجربة تعليمية تفاعلية</p>
+        <button type="button" class="btn-skip" id="btnSkip" aria-label="متابعة">متابعة ←</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        (function() {
+            const LOAD_DURATION = 3200;
+            const REDIRECT_URL = 'index.html';
+
+            const canvas = document.getElementById('loading-canvas');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            camera.position.z = 5;
+
+            // شكل جذاب: كتاب مفتوح (مكعبان مائلان) + جزيئات معرفة
+            const bookLeft = new THREE.BoxGeometry(0.8, 1, 0.1);
+            const bookRight = new THREE.BoxGeometry(0.8, 1, 0.1);
+            const mat = new THREE.MeshPhongMaterial({
+                color: 0x3b82f6,
+                emissive: 0x1e3a5f,
+                shininess: 80
+            });
+            const matPurple = new THREE.MeshPhongMaterial({
+                color: 0x8b5cf6,
+                emissive: 0x2e1065,
+                shininess: 80
+            });
+            const leftPage = new THREE.Mesh(bookLeft, mat);
+            const rightPage = new THREE.Mesh(bookRight, matPurple);
+            leftPage.position.set(-0.4, 0, 0);
+            leftPage.rotation.y = 0.3;
+            rightPage.position.set(0.4, 0, 0);
+            rightPage.rotation.y = -0.3;
+            scene.add(leftPage);
+            scene.add(rightPage);
+
+            // نجمة/شارة فوق الكتاب
+            const starGeom = new THREE.OctahedronGeometry(0.25, 0);
+            const starMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
+            const star = new THREE.Mesh(starGeom, starMat);
+            star.position.y = 0.8;
+            scene.add(star);
+
+            // جزيئات دوارة
+            const particlesGeom = new THREE.BufferGeometry();
+            const pCount = 400;
+            const posArray = new Float32Array(pCount * 3);
+            for (let i = 0; i < pCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 12;
+            particlesGeom.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const particlesMat = new THREE.PointsMaterial({
+                size: 0.06,
+                color: 0x3b82f6,
+                transparent: true,
+                opacity: 0.8
+            });
+            const particles = new THREE.Points(particlesGeom, particlesMat);
+            scene.add(particles);
+
+            // إضاءة
+            const light = new THREE.PointLight(0xffffff, 1.2);
+            light.position.set(2, 2, 5);
+            scene.add(light);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+
+            let time = 0;
+            function animate() {
+                requestAnimationFrame(animate);
+                time += 0.016;
+                leftPage.rotation.y = 0.3 + Math.sin(time) * 0.05;
+                rightPage.rotation.y = -0.3 - Math.sin(time) * 0.05;
+                star.rotation.y += 0.02;
+                star.position.y = 0.8 + Math.sin(time * 2) * 0.05;
+                particles.rotation.y += 0.004;
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', function() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            function goToMain() {
+                window.location.href = REDIRECT_URL;
+            }
+
+            document.getElementById('btnSkip').addEventListener('click', goToMain);
+            setTimeout(goToMain, LOAD_DURATION);
+        })();
+    </script>
+</body>
+</html>

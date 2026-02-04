@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, collection, getDocs, query, orderBy, doc, setDoc, getDoc } from 'firebase/firestore';
 import { firebaseConfig, Exam, User, ExamResult } from './firebase-config';
+import './toast-types';
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -82,8 +83,10 @@ function createExamCard(exam: Exam): HTMLElement {
 
 async function handleStartExam(exam: Exam) {
     if (!currentUser) {
-        alert('يجب تسجيل الدخول لبدء الامتحان');
-        window.location.href = '/login.html';
+        (window as any).showToast('يجب تسجيل الدخول لبدء الامتحان', 'warning');
+        setTimeout(() => {
+            window.location.href = '/login.html';
+        }, 2000);
         return;
     }
 
@@ -229,15 +232,19 @@ async function handleSubmitExam(exam: Exam, form: HTMLFormElement) {
         showResultModal(result, exam);
     } catch (error) {
         console.error('Error saving exam result:', error);
-        alert('حدث خطأ أثناء حفظ النتيجة');
+        (window as any).showToast('حدث خطأ أثناء حفظ النتيجة', 'error');
     }
 }
 
 function autoSubmitExam() {
     const form = document.getElementById('examForm') as HTMLFormElement;
     if (form && currentExam) {
-        alert('انتهى الوقت! سيتم إرسال إجاباتك تلقائياً');
-        handleSubmitExam(currentExam, form);
+        (window as any).showToast('انتهى الوقت! سيتم إرسال إجاباتك تلقائياً', 'warning', 3000);
+        setTimeout(() => {
+            if (currentExam) { // Check again to satisfy TypeScript
+                handleSubmitExam(currentExam, form);
+            }
+        }, 1000);
     }
 }
 

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الملف الشخصي - منصة التعلم</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/pages_style/profile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="description" content="الملف الشخصي للطالب - تتبع التقدم وإدارة المهام والإنجازات">
+    <meta name="keywords" content="ملف شخصي, طالب, تعلم, مهام, إنجازات">
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Profile Header -->
+            <section class="profile-header">
+                <div class="profile-avatar">
+                    <span id="userInitials">👤</span>
+                </div>
+                <div class="profile-info">
+                    <h1 id="userName" class="profile-name">المستخدم</h1>
+                    <p id="userEmail" class="profile-email">user@example.com</p>
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <div class="stat-number" id="watchedVideos">0</div>
+                            <div class="stat-label">فيديو مكتمل</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="stat-number" id="passedExams">0</div>
+                            <div class="stat-label">امتحان مجتاز</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="stat-number" id="totalTodos">0</div>
+                            <div class="stat-label">مهمة نشطة</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Progress Overview -->
+            <section class="progress-overview">
+                <h2 class="section-title">📈 نظرة عامة على التقدم</h2>
+                <div class="progress-grid">
+                    <div class="progress-card">
+                        <div class="progress-header">
+                            <h3>🎥 الفيديوهات</h3>
+                            <span id="videoProgress" class="progress-percentage">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="videoProgressBar" class="progress-fill"></div>
+                        </div>
+                        <div class="progress-details">
+                            <span><span id="completedVideos">0</span> من <span id="totalVideosCount">0</span> فيديو</span>
+                        </div>
+                    </div>
+                    <div class="progress-card">
+                        <div class="progress-header">
+                            <h3>📝 الامتحانات</h3>
+                            <span id="examProgress" class="progress-percentage">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="examProgressBar" class="progress-fill"></div>
+                        </div>
+                        <div class="progress-details">
+                            <span><span id="completedExams">0</span> من <span id="totalExamsCount">0</span> امتحان</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tabs Navigation -->
+            <div class="tabs-container">
+                <div class="tabs-nav">
+                    <button class="tab-btn active" data-tab="todos">
+                        <span>✅</span> قائمة المهام
+                    </button>
+                    <button class="tab-btn" data-tab="results">
+                        <span>📊</span> نتائج الامتحانات
+                    </button>
+                    <button class="tab-btn" data-tab="achievements">
+                        <span>🏆</span> الإنجازات
+                    </button>
+                </div>
+
+                <!-- Todo List Tab -->
+                <div id="todosTab" class="tab-content active">
+                    <div class="todo-section">
+                        <div class="todo-header">
+                            <h2>✅ قائمة المهام الشخصية</h2>
+                            <div class="todo-controls">
+                                <div class="filter-buttons">
+                                    <button class="filter-btn active" data-filter="all">الكل</button>
+                                    <button class="filter-btn" data-filter="pending">معلقة</button>
+                                    <button class="filter-btn" data-filter="completed">مكتملة</button>
+                                </div>
+                                <button id="addTodoBtn" class="btn-primary">
+                                    <span>➕</span>
+                                    إضافة مهمة جديدة
+                                </button>
+                            </div>
+                        </div>
+                        <div id="todoList" class="todo-list">
+                            <!-- Todo items will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exam Results Tab -->
+                <div id="resultsTab" class="tab-content">
+                    <div class="results-section">
+                        <h2>📊 نتائج الامتحانات</h2>
+                        <div id="examResults" class="results-grid">
+                            <!-- Exam results will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements Tab -->
+                <div id="achievementsTab" class="tab-content">
+                    <div class="achievements-section">
+                        <h2>🏆 الإنجازات والشارات</h2>
+                        <div id="achievementsList" class="achievements-grid">
+                            <!-- Achievements will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Enhanced Footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>⏳ جاري تحميل بياناتك...</p>
+    </div>
+
+    <script src="../assets/js/components-loader.js"></script>
+    <script type="module" src="../assets/js/profile.js"></script>
+</body>
+</html>

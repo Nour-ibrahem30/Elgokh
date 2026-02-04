@@ -21,9 +21,9 @@ const server = http.createServer((req, res) => {
 
     let filePath = '.' + req.url;
     
-    // Handle root and directory requests
+    // Handle root: show loading page first, then user is redirected to index
     if (filePath === './') {
-        filePath = './index.html';
+        filePath = './loading.html';
     } else if (filePath === './public' || filePath === './public/') {
         filePath = './public/pages/index.html';
     }

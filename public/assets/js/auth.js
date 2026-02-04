@@ -26,13 +26,14 @@ function setLoading(isLoading) {
     loginBtn.classList.toggle('loading', isLoading);
 }
 async function createUserProfile(uid, email, name) {
-    const role = email.includes('teacher') || email.includes('admin') || email === 'mohamednaser@gmail.com' ? 'teacher' : 'student';
+    const role = email === 'mohamednaser@gmail.com' ? 'teacher' : 'student';
     const userDoc = {
         uid,
         name,
         email,
         role,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
     };
     await setDoc(doc(db, 'users', uid), userDoc);
     return userDoc;

@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
 import { firebaseConfig, Lesson, User } from './firebase-config';
+import './toast-types';
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -93,8 +94,10 @@ function formatDuration(seconds: number): string {
 
 async function handleWatchVideo(video: Lesson) {
     if (!currentUser) {
-        alert('يجب تسجيل الدخول لمشاهدة الفيديوهات');
-        window.location.href = '/login.html';
+        (window as any).showToast('يجب تسجيل الدخول لمشاهدة الفيديوهات', 'warning');
+        setTimeout(() => {
+            window.location.href = '/login.html';
+        }, 2000);
         return;
     }
 

@@ -14,6 +14,7 @@ export interface User {
     email: string;
     role: 'student' | 'teacher';
     createdAt: string;
+    updatedAt?: string;
     photoURL?: string;
 }
 export interface Course {
@@ -94,5 +95,6 @@ export interface TodoItem {
     dueDate?: string;
     priority: 'high' | 'medium' | 'low';
     createdAt: string;
+    updatedAt?: string;
 }
 //# sourceMappingURL=firebase-config.d.ts.map
