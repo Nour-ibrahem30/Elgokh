@@ -5,6 +5,14 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "outDir": "./public/assets/dist",
     "rootDir": "./public/assets/ts",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["public/assets/ts/*"],
+      "@utils/*": ["public/assets/ts/utils/*"],
+      "@services/*": ["public/assets/ts/services/*"],
+      "@components/*": ["public/assets/ts/components/*"],
+      "@types/*": ["public/assets/ts/types/*"]
+    },
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -18,13 +26,17 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true
   },
   "include": [
     "public/assets/ts/**/*"
   ],
   "exclude": [
     "node_modules",
-    "public/assets/dist"
+    "public/assets/dist",
+    "coverage",
+    "tests"
   ]
 }

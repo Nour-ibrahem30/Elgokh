@@ -11,15 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <meta name="description" content="الملف الشخصي للطالب - تتبع التقدم وإدارة المهام والإنجازات">
     <meta name="keywords" content="ملف شخصي, طالب, تعلم, مهام, إنجازات">
-    <script type="importmap">
-        {
-            "imports": {
-                "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
-                "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js",
-                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
-            }
-        }
-    </script>
 </head>
 <body>
     <div id="navbar-placeholder"></div>
@@ -33,8 +24,8 @@
                     <span id="userInitials">👤</span>
                 </div>
                 <div class="profile-info">
-                    <h1 id="userName" class="profile-name">المستخدم</h1>
-                    <p id="userEmail" class="profile-email">user@example.com</p>
+                    <h1 id="userName" class="profile-name"></h1>
+                    <p id="userEmail" class="profile-email"></p>
                     <div class="profile-stats">
                         <div class="profile-stat">
                             <div class="stat-number" id="watchedVideos">0</div>
@@ -152,7 +143,12 @@
         <p>⏳ جاري تحميل بياناتك...</p>
     </div>
 
-    <script src="../assets/dist/components-loader.js"></script>
-    <script type="module" src="../assets/dist/profile.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <script src="../assets/js/components-loader.js"></script>
+    <script src="../assets/js/profile.js"></script>
 </body>
 </html>

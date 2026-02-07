@@ -11,16 +11,6 @@
     
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/css/pages_style/dashboard.css">
-    <link rel="stylesheet" href="../assets/css/pages_style/students.css">
-    <script type="importmap">
-        {
-            "imports": {
-                "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
-                "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js",
-                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
-            }
-        }
-    </script>
     <style>
         #three-canvas {
             position: fixed;
@@ -464,34 +454,30 @@
     <div class="dashboard-layout">
         <aside class="dashboard-sidebar" role="navigation" aria-label="القائمة الجانبية">
             <nav class="sidebar-nav">
-                <a href="#overview" class="sidebar-link active" data-section="overview">
+                <button href="#overview" class="sidebar-link active" data-section="overview">
                     <span class="sidebar-icon" aria-hidden="true">📊</span>
                     <span>نظرة عامة</span>
-                </a>
-                <a href="#videos" class="sidebar-link" data-section="videos">
+                </button>
+                <button href="#videos" class="sidebar-link" data-section="videos">
                     <span class="sidebar-icon" aria-hidden="true">🎥</span>
                     <span>إدارة الفيديوهات</span>
-                </a>
-                <a href="#exams" class="sidebar-link" data-section="exams">
+                </button>
+                <button href="#exams" class="sidebar-link" data-section="exams">
                     <span class="sidebar-icon" aria-hidden="true">📋</span>
                     <span>إدارة الامتحانات</span>
-                </a>
-                <a href="#notes" class="sidebar-link" data-section="notes">
+                </button>
+                <button href="#notes" class="sidebar-link" data-section="notes">
                     <span class="sidebar-icon" aria-hidden="true">📝</span>
                     <span>إدارة الملاحظات</span>
-                </a>
-                <a href="#materials" class="sidebar-link" data-section="materials">
+                </button>
+                <button href="#materials" class="sidebar-link" data-section="materials">
                     <span class="sidebar-icon" aria-hidden="true">📚</span>
                     <span>إدارة المذكرات</span>
-                </a>
-                <a href="#testimonials" class="sidebar-link" data-section="testimonials">
-                    <span class="sidebar-icon" aria-hidden="true">💬</span>
-                    <span>إدارة الآراء</span>
-                </a>
-                <a href="#students" class="sidebar-link" data-section="students">
+                </button>
+                <button href="#students" class="sidebar-link" data-section="students">
                     <span class="sidebar-icon" aria-hidden="true">👥</span>
                     <span>الطلاب</span>
-                </a>
+                </button>
             </nav>
         </aside>
 
@@ -554,7 +540,7 @@
                 <div class="section-header">
                     <h1 class="dashboard-title">إدارة الامتحانات</h1>
                     <button class="btn btn-primary" id="addExamBtn">
-                        <span aria-hidden="true">➕</span> إضافة امتحان
+                        <span aria-hidden="true">➕</span> إنشاء امتحان
                     </button>
                 </div>
                 
@@ -591,19 +577,8 @@
                 <div id="materialsGrade3" class="materials-content" style="display: none;"></div>
             </section>
 
-            <section id="testimonials-section" class="dashboard-section">
-                <div class="section-header">
-                    <h1 class="dashboard-title">إدارة آراء الطلاب</h1>
-                    <button class="btn btn-primary" id="addTestimonialBtn">
-                        <span aria-hidden="true">➕</span> إضافة رأي
-                    </button>
-                </div>
-                
-                <div id="testimonialsList" class="content-list"></div>
-            </section>
-
             <section id="students-section" class="dashboard-section">
-                <h1 class="dashboard-title">الطلاب</h1>
+                <h1 class="dashboard-title">الطلاب المسجلين</h1>
                 <div id="studentsList" class="students-grid"></div>
             </section>
         </main>
@@ -611,22 +586,9 @@
 
     <div id="footer-placeholder"></div>
 
-    <!-- Student Detail Modal -->
-    <div id="studentModal" class="modal" aria-hidden="true">
-      <div class="modal-backdrop" onclick="document.getElementById('studentModal').classList.remove('open')"></div>
-      <div class="modal-dialog">
-        <button class="modal-close" onclick="document.getElementById('studentModal').classList.remove('open')">×</button>
-        <h3 id="modalStudentName">اسم الطالب</h3>
-        <div class="student-info">
-          <div><strong>البريد:</strong> <span id="modalStudentEmail"></span></div>
-          <div><strong>انضم:</strong> <span id="modalStudentJoined"></span></div>
-          <div id="modalStudentDetails"></div>
-        </div>
-      </div>
-    </div>
-
-    <script src="../assets/dist/components-loader.js"></script>
+    <script src="../assets/js/components-loader.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="../assets/dist/dashboard.js" type="module"></script>
     <script>
         // 🔐 Authenticationop
         function checkDashboardAuth() {
@@ -885,14 +847,12 @@
             let videos = JSON.parse(localStorage.getItem('videos') || '[]');
             let exams = JSON.parse(localStorage.getItem('exams') || '[]');
             let notes = JSON.parse(localStorage.getItem('notes') || '[]');
-            let testimonials = JSON.parse(localStorage.getItem('testimonials') || '[]');
             let materials = JSON.parse(localStorage.getItem('materials') || '[]');
             
             console.log('Loaded data:', {
                 videos: videos.length,
                 exams: exams.length,
                 notes: notes.length,
-                
                 materials: materials.length
             });
             
@@ -903,7 +863,6 @@
                     localStorage.setItem('videos', JSON.stringify(videos));
                     localStorage.setItem('exams', JSON.stringify(exams));
                     localStorage.setItem('notes', JSON.stringify(notes));
-                    localStorage.setItem('testimonials', JSON.stringify(testimonials));
                     localStorage.setItem('materials', JSON.stringify(materials));
                     console.log('Data saved successfully!');
                     return true;
@@ -917,7 +876,7 @@
             // Modal Functions
             function createModal(title, content, onSubmit) {
                 console.log('🔄 Creating modal:', title);
-
+                
                 const modal = document.createElement('div');
                 modal.className = 'modal-overlay active';
                 modal.innerHTML = `
@@ -935,33 +894,34 @@
                         </div>
                     </div>
                 `;
-
+                
                 document.body.appendChild(modal);
-
+                
                 const closeBtn = modal.querySelector('.modal-close');
                 const cancelBtn = modal.querySelector('.modal-cancel');
                 const submitBtn = modal.querySelector('.modal-submit');
-
+                
                 function closeModal() {
                     console.log('🔄 Closing modal');
                     modal.classList.remove('active');
                     setTimeout(() => modal.remove(), 300);
                 }
-
+                
                 closeBtn.addEventListener('click', closeModal);
                 cancelBtn.addEventListener('click', closeModal);
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) closeModal();
                 });
-
+                
                 submitBtn.addEventListener('click', () => {
                     console.log('Modal submit clicked');
                     submitBtn.disabled = true;
                     submitBtn.textContent = 'جاري الحفظ...';
-
+                    
                     try {
                         const result = onSubmit(closeModal);
-
+                        
+                        // If result is a promise, wait for it
                         if (result && typeof result.then === 'function') {
                             result.then((success) => {
                                 if (success !== false) {
@@ -987,7 +947,7 @@
                         submitBtn.textContent = 'حفظ';
                     }
                 });
-
+                
                 return modal;
             }
 
@@ -1051,80 +1011,321 @@
                     const targetSection = document.getElementById(`${sectionId}-section`);
                     if (targetSection) {
                         targetSection.classList.add('active');
+                        
+                        // Load students when students section is opened
+                        if (sectionId === 'students') {
+                            loadStudents();
+                        }
                     }
                 });
             });
 
-            // Add Testimonial Button
-            const addTestimonialBtn = document.getElementById('addTestimonialBtn');
-            if (addTestimonialBtn) {
-                console.log('Add Testimonial Button found');
-                addTestimonialBtn.addEventListener('click', function() {
-                    console.log('Add Testimonial button clicked');
+            // Video source selection handler
+            document.addEventListener('change', function(e) {
+                if (e.target.id === 'videoSource') {
+                    const source = e.target.value;
+                    const youtubeGroup = document.getElementById('youtubeGroup');
+                    const uploadGroup = document.getElementById('uploadGroup');
+                    
+                    if (source === 'youtube') {
+                        youtubeGroup.style.display = 'block';
+                        uploadGroup.style.display = 'none';
+                        document.getElementById('videoUrl').required = true;
+                        document.getElementById('videoFile').required = false;
+                    } else if (source === 'upload') {
+                        youtubeGroup.style.display = 'none';
+                        uploadGroup.style.display = 'block';
+                        document.getElementById('videoUrl').required = false;
+                        document.getElementById('videoFile').required = true;
+                    } else {
+                        youtubeGroup.style.display = 'none';
+                        uploadGroup.style.display = 'none';
+                        document.getElementById('videoUrl').required = false;
+                        document.getElementById('videoFile').required = false;
+                    }
+                }
+                
+                if (e.target.id === 'materialSource') {
+                    const source = e.target.value;
+                    const uploadGroup = document.getElementById('uploadMaterialGroup');
+                    const linkGroup = document.getElementById('linkMaterialGroup');
+                    
+                    if (source === 'upload') {
+                        uploadGroup.style.display = 'block';
+                        linkGroup.style.display = 'none';
+                        document.getElementById('materialFile').required = true;
+                        document.getElementById('materialUrl').required = false;
+                    } else if (source === 'drive' || source === 'external') {
+                        uploadGroup.style.display = 'none';
+                        linkGroup.style.display = 'block';
+                        document.getElementById('materialFile').required = false;
+                        document.getElementById('materialUrl').required = true;
+                    } else {
+                        uploadGroup.style.display = 'none';
+                        linkGroup.style.display = 'none';
+                        document.getElementById('materialFile').required = false;
+                        document.getElementById('materialUrl').required = false;
+                    }
+                }
+            });
+
+            // Load Students Function
+            function loadStudents() {
+                console.log('Loading students...');
+                const studentsList = document.getElementById('studentsList');
+                if (!studentsList) return;
+                
+                // Get registered users from localStorage
+                const registeredUsers = [];
+                
+                // Check for stored users in different formats
+                try {
+                    const currentUser = localStorage.getItem('currentUser');
+                    const currentUserEmail = localStorage.getItem('currentUserEmail');
+                    const userRole = localStorage.getItem('userRole');
+                    
+                    if (currentUser && currentUserEmail && userRole === 'student') {
+                        const userData = JSON.parse(currentUser);
+                        registeredUsers.push({
+                            name: userData.name || extractNameFromEmail(currentUserEmail),
+                            email: currentUserEmail,
+                            role: 'student',
+                            joinDate: new Date().toLocaleDateString('ar-EG')
+                        });
+                    }
+                    
+                    // Add sample students for demo
+                    const sampleStudents = [
+                        { name: 'أحمد محمد', email: 'ahmed@student.com', role: 'student', joinDate: '2024-01-15' },
+                        { name: 'فاطمة علي', email: 'fatima@student.com', role: 'student', joinDate: '2024-01-20' },
+                        { name: 'محمود حسن', email: 'mahmoud@student.com', role: 'student', joinDate: '2024-01-25' },
+                        { name: 'نور الدين', email: 'nour@student.com', role: 'student', joinDate: '2024-02-01' }
+                    ];
+                    
+                    registeredUsers.push(...sampleStudents);
+                    
+                } catch (error) {
+                    console.error('Error loading students:', error);
+                }
+                
+                if (registeredUsers.length === 0) {
+                    studentsList.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 2rem;">لا يوجد طلاب مسجلين حالياً</p>';
+                    return;
+                }
+                
+                studentsList.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+                        ${registeredUsers.map(student => `
+                            <div class="content-item">
+                                <div class="content-item-header">
+                                    <h3 class="content-item-title">👤 ${student.name}</h3>
+                                </div>
+                                <p style="color: #94a3b8; margin-top: 0.5rem;">📧 ${student.email}</p>
+                                <p style="color: #64748b; font-size: 0.875rem; margin-top: 0.5rem;">📅 تاريخ التسجيل: ${student.joinDate}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Update students count
+                document.getElementById('totalStudents').textContent = registeredUsers.length;
+                
+                console.log('Students loaded:', registeredUsers.length);
+            }
+            
+            function extractNameFromEmail(email) {
+                const namePart = email.split('@')[0];
+                return namePart
+                    .replace(/[._]/g, ' ')
+                    .split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .join(' ');
+            }
+
+            // Add Video Button
+            const addVideoBtn = document.getElementById('addVideoBtn');
+            if (addVideoBtn) {
+                console.log('Add Video Button found');
+                addVideoBtn.addEventListener('click', function() {
+                    console.log('Add Video button clicked');
                     createModal(
-                        'إضافة رأي طالب',
+                        'إضافة فيديو جديد',
                         `
-                        <form id="testimonialForm">
+                        <form id="videoForm">
                             <div class="form-group">
-                                <label class="form-label">اسم الطالب</label>
-                                <input type="text" class="form-input" id="studentName" required>
+                                <label class="form-label">عنوان الفيديو</label>
+                                <input type="text" class="form-input" id="videoTitle" required>
                             </div>
                             <div class="form-group">
-                         <label class="form-label">الرأي</label>
-                                <textarea class="form-textarea" id="testimonialComment" rows="4" required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">التقييم</label>
-                                <select class="form-select" id="testimonialRating" required>
-                                    <option value="">اختر التقييم</option>
-                                    <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
-                                    <option value="4">⭐⭐⭐⭐ (4/5)</option>
-                                    <option value="3">⭐⭐⭐ (3/5)</option>
-                                    <option value="2">⭐⭐ (2/5)</option>
-                                    <option value="1">⭐ (1/5)</option>
+                                <label class="form-label">مصدر الفيديو</label>
+                                <select class="form-select" id="videoSource" required>
+                                    <option value="">اختر المصدر</option>
+                                    <option value="youtube">رابط YouTube</option>
+                                    <option value="upload">رفع من الجهاز</option>
                                 </select>
+                            </div>
+                            <div class="form-group" id="youtubeGroup" style="display: none;">
+                                <label class="form-label">رابط الفيديو (YouTube)</label>
+                                <input type="url" class="form-input" id="videoUrl" placeholder="https://www.youtube.com/watch?v=...">
+                            </div>
+                            <div class="form-group" id="uploadGroup" style="display: none;">
+                                <label class="form-label">رفع ملف الفيديو</label>
+                                <input type="file" class="form-input" id="videoFile" accept="video/*">
+                                <p style="color: #94a3b8; font-size: 0.875rem; margin-top: 0.5rem;">الحد الأقصى: 50 ميجابايت</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">المحتوى/الملاحظات</label>
+                                <textarea class="form-textarea" id="videoNotes" rows="4" placeholder="ملاحظات اختيارية حول الفيديو"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">المدة (دقائق)</label>
+                                <input type="number" class="form-input" id="videoDuration" min="0" placeholder="0" required>
                             </div>
                         </form>
                         `,
                         () => {
-                            console.log('Processing testimonial form...');
-                            const studentName = document.getElementById('studentName').value.trim();
-                            const comment = document.getElementById('testimonialComment').value.trim();
-                            const rating = document.getElementById('testimonialRating').value;
+                            console.log('Processing video form...');
+                            const title = document.getElementById('videoTitle').value.trim();
+                            const source = document.getElementById('videoSource').value;
+                            const url = document.getElementById('videoUrl').value.trim();
+                            const fileInput = document.getElementById('videoFile');
+                            const notes = document.getElementById('videoNotes').value.trim();
+                            const duration = document.getElementById('videoDuration').value;
                             
-                            console.log('📋 Form data:', { studentName, comment, rating });
+                            console.log('📹 Form data:', { title, source, url, hasFile: !!fileInput.files[0], notes, duration });
                             
-                            if (!studentName || !comment || !rating) {
+                            if (!title || !source || !duration) {
                                 showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
                                 return false;
                             }
                             
-                            const newTestimonial = {
+                            let videoUrl = '';
+                            
+                            if (source === 'youtube') {
+                                if (!url) {
+                                    showToast('يرجى إدخال رابط YouTube', 'error');
+                                    return false;
+                                }
+                                videoUrl = url;
+                            } else if (source === 'upload') {
+                                if (!fileInput.files || !fileInput.files[0]) {
+                                    showToast('يرجى اختيار ملف الفيديو', 'error');
+                                    return false;
+                                }
+                                
+                                const file = fileInput.files[0];
+                                if (file.size > 50 * 1024 * 1024) {
+                                    showToast('حجم الملف كبير جداً (الحد الأقصى 50 ميجابايت)', 'error');
+                                    return false;
+                                }
+                                
+                                // For demo, we'll use a placeholder URL
+                                videoUrl = URL.createObjectURL(file);
+                            }
+                            
+                            const newVideo = {
                                 id: Date.now(),
-                                studentName,
-                                comment,
-                                rating: parseInt(rating),
+                                title,
+                                videoUrl,
+                                source,
+                                notes,
+                                duration: parseInt(duration),
                                 createdAt: new Date().toISOString()
                             };
                             
-                            console.log('Adding testimonial:', newTestimonial);
-                            testimonials.push(newTestimonial);
+                            console.log('Adding video:', newVideo);
+                            videos.push(newVideo);
                             
                             if (saveData()) {
-                                renderTestimonials();
-                                showToast('تم إضافة رأي الطالب بنجاح!', 'success');
-                                console.log('Testimonial added successfully');
+                                renderVideos();
+                                updateStats();
+                                showToast('تم إضافة الفيديو بنجاح!', 'success');
+                                console.log('Video added successfully');
                                 return true;
                             } else {
-                                console.error('Failed to save testimonial');
+                                console.error('Failed to save video');
                                 return false;
                             }
                         }
                     );
                 });
             } else {
-                console.error('Add Testimonial Button not found!');
+                console.error('Add Video Button not found!');
             }
+
+            // Add Exam Button
+            const addExamBtn = document.getElementById('addExamBtn');
+            if (addExamBtn) {
+                console.log('Add Exam Button found');
+                addExamBtn.addEventListener('click', function() {
+                    console.log('Add Exam button clicked');
+                    createModal(
+                        'إضافة امتحان جديد',
+                        `
+                        <form id="examForm">
+                            <div class="form-group">
+                                <label class="form-label">عنوان الامتحان</label>
+                                <input type="text" class="form-input" id="examTitle" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">المدة (دقائق)</label>
+                                <input type="number" class="form-input" id="examDuration" min="0" placeholder="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">الوصف</label>
+                                <textarea class="form-textarea" id="examDescription" rows="4" placeholder="وصف الامتحان"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">رابط الامتحان</label>
+                                <input type="url" class="form-input" id="examUrl" placeholder="https://forms.google.com/..." required>
+                                <p style="color: #94a3b8; font-size: 0.875rem; margin-top: 0.5rem;">يمكنك استخدام Google Forms أو أي منصة أخرى</p>
+                            </div>
+                        </form>
+                        `,
+                        () => {
+                            console.log('Processing exam form...');
+                            const title = document.getElementById('examTitle').value.trim();
+                            const duration = document.getElementById('examDuration').value;
+                            const description = document.getElementById('examDescription').value.trim();
+                            const examUrl = document.getElementById('examUrl').value.trim();
+                            
+                            console.log('📋 Form data:', { title, duration, description, examUrl });
+                            
+                            if (!title || !duration || !examUrl) {
+                                showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
+                                return false;
+                            }
+                            
+                            const newExam = {
+                                id: Date.now(),
+                                title,
+                                duration: parseInt(duration),
+                                description,
+                                examUrl,
+                                createdAt: new Date().toISOString()
+                            };
+                            
+                            console.log('Adding exam:', newExam);
+                            exams.push(newExam);
+                            
+                            if (saveData()) {
+                                renderExams();
+                                updateStats();
+                                showToast('تم إضافة الامتحان بنجاح!', 'success');
+                                console.log('Exam added successfully');
+                                return true;
+                            } else {
+                                console.error('Failed to save exam');
+                                return false;
+                            }
+                        }
+                    );
+                });
+            } else {
+                console.error('Add Exam Button not found!');
+            }
+
+
 
             // Add Note Button
             const addNoteBtn = document.getElementById('addNoteBtn');
@@ -1214,14 +1415,27 @@
                                 <select class="form-select" id="materialGrade" required>
                                     <option value="">اختر الصف</option>
                                     <option value="1">الصف الأول الثانوي</option>
-                           <option value="2">الصف الثاني الثانوي</option>
+                                    <option value="2">الصف الثاني الثانوي</option>
                                     <option value="3">الصف الثالث الثانوي</option>
                                 </select>
                             </div>
                             <div class="form-group">
+                                <label class="form-label">مصدر المذكرة</label>
+                                <select class="form-select" id="materialSource" required>
+                                    <option value="">اختر المصدر</option>
+                                    <option value="upload">رفع ملف PDF</option>
+                                    <option value="drive">رابط Google Drive</option>
+                                    <option value="external">رابط خارجي</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="uploadMaterialGroup" style="display: none;">
                                 <label class="form-label">رفع ملف المذكرة (PDF)</label>
-                                <input type="file" class="form-input" id="materialFile" accept=".pdf" required>
+                                <input type="file" class="form-input" id="materialFile" accept=".pdf">
                                 <p style="color: #94a3b8; font-size: 0.875rem; margin-top: 0.5rem;">الحد الأقصى: 10 ميجابايت</p>
+                            </div>
+                            <div class="form-group" id="linkMaterialGroup" style="display: none;">
+                                <label class="form-label">رابط المذكرة</label>
+                                <input type="url" class="form-input" id="materialUrl" placeholder="https://drive.google.com/...">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">الوصف</label>
@@ -1233,57 +1447,93 @@
                             console.log('Processing material form...');
                             const title = document.getElementById('materialTitle').value.trim();
                             const grade = document.getElementById('materialGrade').value;
+                            const source = document.getElementById('materialSource').value;
                             const description = document.getElementById('materialDescription').value.trim();
                             const fileInput = document.getElementById('materialFile');
+                            const urlInput = document.getElementById('materialUrl');
                             
-                            console.log('📋 Form data:', { title, grade, description, hasFile: !!fileInput.files[0] });
+                            console.log('📋 Form data:', { title, grade, source, description });
                             
-                            if (!title || !grade || !fileInput.files || !fileInput.files[0]) {
+                            if (!title || !grade || !source) {
                                 showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
                                 return false;
                             }
                             
-                            const file = fileInput.files[0];
-                            if (file.size > 10 * 1024 * 1024) {
-                                showToast('حجم الملف كبير جداً (الحد الأقصى 10 ميجابايت)', 'error');
-                                return false;
-                            }
+                            let materialUrl = '';
+                            let fileName = '';
+                            let fileSize = '';
                             
-                            return new Promise((resolve) => {
-                                console.log('Reading file...');
-                                const reader = new FileReader();
-                                reader.onload = function(e) {
-                                    const newMaterial = {
-                                        id: Date.now(),
-                                        title,
-                                        grade,
-                                        description,
-                                        fileUrl: e.target.result,
-                                        fileName: file.name,
-                                        fileSize: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
-                                        createdAt: new Date().toISOString()
+                            if (source === 'upload') {
+                                if (!fileInput.files || !fileInput.files[0]) {
+                                    showToast('يرجى اختيار ملف المذكرة', 'error');
+                                    return false;
+                                }
+                                
+                                const file = fileInput.files[0];
+                                if (file.size > 10 * 1024 * 1024) {
+                                    showToast('حجم الملف كبير جداً (الحد الأقصى 10 ميجابايت)', 'error');
+                                    return false;
+                                }
+                                
+                                return new Promise((resolve) => {
+                                    const reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        const newMaterial = {
+                                            id: Date.now(),
+                                            title,
+                                            grade,
+                                            source,
+                                            description,
+                                            fileUrl: e.target.result,
+                                            fileName: file.name,
+                                            fileSize: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+                                            createdAt: new Date().toISOString()
+                                        };
+                                        
+                                        materials.push(newMaterial);
+                                        
+                                        if (saveData()) {
+                                            renderMaterials();
+                                            showToast('تم إضافة المذكرة بنجاح!', 'success');
+                                            resolve(true);
+                                        } else {
+                                            resolve(false);
+                                        }
                                     };
-                                    
-                                    console.log('Adding material:', { ...newMaterial, fileUrl: '[DATA]' });
-                                    materials.push(newMaterial);
-                                    
-                                    if (saveData()) {
-                                        renderMaterials();
-                                        showToast('تم إضافة المذكرة بنجاح!', 'success');
-                                        console.log('Material added successfully');
-                                        resolve(true);
-                                    } else {
-                                        console.error('Failed to save material');
-                                        resolve(false);
-                                    }
+                                    reader.readAsDataURL(file);
+                                });
+                            } else {
+                                if (!urlInput.value.trim()) {
+                                    showToast('يرجى إدخال رابط المذكرة', 'error');
+                                    return false;
+                                }
+                                
+                                materialUrl = urlInput.value.trim();
+                                fileName = 'رابط خارجي';
+                                fileSize = 'غير محدد';
+                                
+                                const newMaterial = {
+                                    id: Date.now(),
+                                    title,
+                                    grade,
+                                    source,
+                                    description,
+                                    fileUrl: materialUrl,
+                                    fileName,
+                                    fileSize,
+                                    createdAt: new Date().toISOString()
                                 };
-                                reader.onerror = function() {
-                                    console.error('Error reading file');
-                                    showToast('حدث خطأ أثناء قراءة الملف', 'error');
-                                    resolve(false);
-                                };
-                                reader.readAsDataURL(file);
-                            });
+                                
+                                materials.push(newMaterial);
+                                
+                                if (saveData()) {
+                                    renderMaterials();
+                                    showToast('تم إضافة المذكرة بنجاح!', 'success');
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            }
                         }
                     );
                 });
@@ -1311,35 +1561,7 @@
                 });
             });
 
-            // Render Functions
-            function renderTestimonials() {
-                console.log('Rendering testimonials...');
-                const testimonialsList = document.getElementById('testimonialsList');
-                if (!testimonialsList) {
-                    console.error('Testimonials list element not found!');
-                    return;
-                }
-                
-                if (testimonials.length === 0) {
-                    testimonialsList.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 2rem;">لا توجد آراء حالياً</p>';
-                    return;
-                }
-                
-                testimonialsList.innerHTML = testimonials.map(testimonial => `
-                    <div class="content-item">
-                        <div class="content-item-header">
-                            <h3 class="content-item-title">${testimonial.studentName}</h3>
-                            <div class="content-item-actions">
-                                <button class="btn btn-sm btn-danger" onclick="deleteTestimonial(${testimonial.id})">🗑️ حذف</button>
-                            </div>
-                        </div>
-                        <p style="color: #94a3b8; margin-top: 0.5rem;">${testimonial.comment}</p>
-                        <p style="color: #fbbf24; font-size: 1.2rem; margin-top: 0.5rem;">${'⭐'.repeat(testimonial.rating)}</p>
-                    </div>
-                `).join('');
-                
-                console.log('Testimonials rendered:', testimonials.length);
-            }
+
 
             function renderNotes() {
                 console.log('Rendering notes...');
@@ -1418,6 +1640,66 @@
                 console.log('Materials rendered for all grades');
             }
 
+            function renderVideos() {
+                console.log('Rendering videos...');
+                const videosList = document.getElementById('videosList');
+                if (!videosList) {
+                    console.error('Videos list element not found!');
+                    return;
+                }
+                
+                if (videos.length === 0) {
+                    videosList.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 2rem;">لا توجد فيديوهات حالياً</p>';
+                    return;
+                }
+                
+                videosList.innerHTML = videos.map(video => `
+                    <div class="content-item">
+                        <div class="content-item-header">
+                            <h3 class="content-item-title">🎥 ${video.title}</h3>
+                            <div class="content-item-actions">
+                                <button class="btn btn-sm btn-primary" onclick="window.open('${video.videoUrl}', '_blank')">▶️ عرض</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteVideo(${video.id})">🗑️ حذف</button>
+                            </div>
+                        </div>
+                        ${video.notes ? `<p style="color: #94a3b8; margin-top: 0.5rem;">${video.notes}</p>` : ''}
+                        <p style="color: #64748b; font-size: 0.875rem; margin-top: 0.5rem;">المدة: ${video.duration || 0} دقيقة</p>
+                    </div>
+                `).join('');
+                
+                console.log('Videos rendered:', videos.length);
+            }
+
+            function renderExams() {
+                console.log('Rendering exams...');
+                const examsList = document.getElementById('examsList');
+                if (!examsList) {
+                    console.error('Exams list element not found!');
+                    return;
+                }
+                
+                if (exams.length === 0) {
+                    examsList.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 2rem;">لا توجد امتحانات حالياً</p>';
+                    return;
+                }
+                
+                examsList.innerHTML = exams.map(exam => `
+                    <div class="content-item">
+                        <div class="content-item-header">
+                            <h3 class="content-item-title">📋 ${exam.title}</h3>
+                            <div class="content-item-actions">
+                                <button class="btn btn-sm btn-primary" onclick="window.open('${exam.examUrl}', '_blank')">📝 فتح الامتحان</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteExam(${exam.id})">🗑️ حذف</button>
+                            </div>
+                        </div>
+                        ${exam.description ? `<p style="color: #94a3b8; margin-top: 0.5rem;">${exam.description}</p>` : ''}
+                        <p style="color: #64748b; font-size: 0.875rem; margin-top: 0.5rem;">المدة: ${exam.duration || 0} دقيقة</p>
+                    </div>
+                `).join('');
+                
+                console.log('Exams rendered:', exams.length);
+            }
+
             function updateStats() {
                 console.log('Updating stats...');
                 document.getElementById('totalVideos').textContent = videos.length;
@@ -1428,20 +1710,39 @@
             }
 
             // Delete Functions
-            window.deleteTestimonial = function(id) {
-                console.log('Deleting testimonial:', id);
+            window.deleteVideo = function(id) {
+                console.log('Deleting video:', id);
                 createConfirmModal(
-                    'حذف الرأي',
-                    'هل أنت متأكد من حذف هذا الرأي؟',
+                    'حذف الفيديو',
+                    'هل أنت متأكد من حذف هذا الفيديو؟',
                     () => {
-                        testimonials = testimonials.filter(t => t.id !== id);
+                        videos = videos.filter(v => v.id !== id);
                         saveData();
-                        renderTestimonials();
-                        showToast('تم حذف الرأي بنجاح!', 'success');
-                        console.log('Testimonial deleted');
+                        renderVideos();
+                        updateStats();
+                        showToast('تم حذف الفيديو بنجاح!', 'success');
+                        console.log('Video deleted');
                     }
                 );
             };
+
+            window.deleteExam = function(id) {
+                console.log('Deleting exam:', id);
+                createConfirmModal(
+                    'حذف الامتحان',
+                    'هل أنت متأكد من حذف هذا الامتحان؟',
+                    () => {
+                        exams = exams.filter(e => e.id !== id);
+                        saveData();
+                        renderExams();
+                        updateStats();
+                        showToast('تم حذف الامتحان بنجاح!', 'success');
+                        console.log('Exam deleted');
+                    }
+                );
+            };
+
+
 
             window.deleteNote = function(id) {
                 console.log('Deleting note:', id);
@@ -1476,103 +1777,28 @@
 
             // Initial render
             console.log('Initial rendering...');
-            renderTestimonials();
+            renderVideos();
+            renderExams();
             renderNotes();
             renderMaterials();
             updateStats();
             
             // Test buttons after a short delay
             setTimeout(() => {
-                const testimonialBtn = document.getElementById('addTestimonialBtn');
                 const noteBtn = document.getElementById('addNoteBtn');
                 const materialBtn = document.getElementById('addMaterialBtn');
                 
                 console.log('Button status check:', {
-                    testimonialBtn: !!testimonialBtn,
                     noteBtn: !!noteBtn,
                     materialBtn: !!materialBtn
                 });
                 
-                if (!testimonialBtn) console.error('Testimonial button missing!');
                 if (!noteBtn) console.error('Note button missing!');
                 if (!materialBtn) console.error('Material button missing!');
             }, 1000);
             
             console.log('Dashboard initialization complete!');
         });
-    </script>
-
-    <script type="module">
-        import { initializeApp } from 'firebase/app';
-        import { getFirestore, collection, getDocs, query, where } from 'firebase/firestore';
-        import { firebaseConfig } from '../assets/dist/firebase-config.js';
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        async function loadAllStudents() {
-            const container = document.getElementById('studentsList');
-            if (!container) return;
-
-            container.innerHTML = '<div class="loading"><div class="spinner"></div><span>جاري تحميل الطلاب...</span></div>';
-
-            try {
-                const snapshot = await getDocs(query(collection(db, 'users'), where('role', '==', 'student')));
-
-                const totalStudentsEl = document.getElementById('totalStudents');
-                if (totalStudentsEl) totalStudentsEl.textContent = snapshot.size.toString();
-
-                if (snapshot.empty) {
-                    container.innerHTML = '<div class="empty-state"><p>لا يوجد طلاب</p></div>';
-                    return;
-                }
-
-                container.innerHTML = '';
-                snapshot.forEach((docSnap) => {
-                    const student = docSnap.data();
-                    const card = document.createElement('div');
-                    card.className = 'student-card';
-                    card.setAttribute('data-uid', docSnap.id);
-                    card.innerHTML = `
-                        <div class="student-avatar">${(student.name||student.email||'طالب').split(' ').map(w=>w.charAt(0)).join('').toUpperCase().slice(0,2)}</div>
-                        <div class="student-body">
-                          <h4 class="student-name">${student.name || 'طالب'}</h4>
-                          <div class="student-email">${student.email || ''}</div>
-                        </div>
-                        <div class="student-meta">انضم: ${student.createdAt ? new Date(student.createdAt).toLocaleDateString('ar-EG') : '-'}</div>
-                    `;
-                    container.appendChild(card);
-                });
-
-                // delegation for student click -> open modal
-                container.addEventListener('click', async function(ev){
-                    const target = ev.target;
-                    const card = target.closest && target.closest('.student-card');
-                    if (!card) return;
-                    const uid = card.getAttribute('data-uid');
-                    if (!uid) return;
-
-                    try{
-                        const d = await getDocs(query(collection(db,'users'), where('__name__','==', uid)));
-                        let studentData = null;
-                        if (!d.empty) studentData = d.docs[0].data();
-                        // populate modal
-                        const modal = document.getElementById('studentModal');
-                        if (!modal) return;
-                        (document.getElementById('modalStudentName')).textContent = (studentData && studentData.name) || student.name || 'طالب';
-                        (document.getElementById('modalStudentEmail')).textContent = (studentData && studentData.email) || student.email || '';
-                        (document.getElementById('modalStudentJoined')).textContent = (studentData && studentData.createdAt) ? new Date(studentData.createdAt).toLocaleString('ar-EG') : (student.createdAt ? new Date(student.createdAt).toLocaleString('ar-EG') : '-');
-                        (document.getElementById('modalStudentDetails')).textContent = (studentData && (studentData.bio || studentData.note)) || '';
-                        modal.classList.add('open');
-                    }catch(err){console.error(err);}
-                });
-            } catch (error) {
-                console.error('Error loading students:', error);
-                container.innerHTML = '<div class="error-state"><p>حدث خطأ</p></div>';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', loadAllStudents);
     </script>
 </body>
 </html>

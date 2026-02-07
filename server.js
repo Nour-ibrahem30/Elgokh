@@ -1,8 +1,24 @@
+require('dotenv').config();
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
+
+// Rate limiting storage
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW = parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000; // 15 min
+const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100;
+
+// Clean up old rate limit entries every 5 minutes
+setInterval(() => {
+    const now = Date.now();
+    for (const [ip, data] of rateLimitMap.entries()) {
+        if (now - data.resetTime > RATE_LIMIT_WINDOW) {
+            rateLimitMap.delete(ip);
+        }
+    }
+}, 300000);
 
 const mimeTypes = {
     '.html': 'text/html',
@@ -17,6 +33,28 @@ const mimeTypes = {
 };
 
 const server = http.createServer((req, res) => {
+    // Get client IP
+    const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    
+    // Rate limiting check
+    const now = Date.now();
+    if (!rateLimitMap.has(clientIP)) {
+        rateLimitMap.set(clientIP, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    } else {
+        const rateData = rateLimitMap.get(clientIP);
+        if (now > rateData.resetTime) {
+            rateData.count = 1;
+            rateData.resetTime = now + RATE_LIMIT_WINDOW;
+        } else {
+            rateData.count++;
+            if (rateData.count > RATE_LIMIT_MAX) {
+                res.writeHead(429, { 'Content-Type': 'text/html; charset=utf-8' });
+                res.end('<h1>429 - تم تجاوز الحد المسموح من الطلبات</h1><p>يرجى المحاولة لاحقاً</p>', 'utf-8');
+                return;
+            }
+        }
+    }
+    
     console.log(`${req.method} ${req.url}`);
 
     let filePath = '.' + req.url;

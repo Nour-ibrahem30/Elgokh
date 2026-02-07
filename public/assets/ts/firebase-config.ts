@@ -1,14 +1,60 @@
-// Firebase Configuration
-export const firebaseConfig = {
-  apiKey: "AIzaSyAU0CCiQNrPEYpTNU4rAwmOmPUZnjb2FoU",
-  authDomain: "a-platform-for-learning.firebaseapp.com",
-  projectId: "a-platform-for-learning",
-  storageBucket: "a-platform-for-learning.firebasestorage.app",
-  messagingSenderId: "764579707883",
-  appId: "1:764579707883:web:5456e2348354cc58fab7ae",
-  measurementId: "G-4P972FP416",
-  databaseURL: "https://a-platform-for-learning-default-rtdb.firebaseio.com"
-};
+// Firebase Configuration Interface
+export interface FirebaseConfig {
+  apiKey: string;
+  authDomain: string;
+  projectId: string;
+  storageBucket: string;
+  messagingSenderId: string;
+  appId: string;
+  measurementId?: string;
+  databaseURL: string;
+}
+
+/**
+ * Load Firebase configuration from environment variables
+ * Ensures sensitive data is not hardcoded in the application
+ * @throws Error if required environment variables are missing
+ */
+function getFirebaseConfig(): FirebaseConfig {
+  const requiredVars = [
+    'VITE_FIREBASE_API_KEY',
+    'VITE_FIREBASE_AUTH_DOMAIN',
+    'VITE_FIREBASE_PROJECT_ID',
+    'VITE_FIREBASE_STORAGE_BUCKET',
+    'VITE_FIREBASE_MESSAGING_SENDER_ID',
+    'VITE_FIREBASE_APP_ID',
+    'VITE_FIREBASE_DATABASE_URL'
+  ];
+
+  // Access import.meta.env with proper typing
+  // @ts-ignore - import.meta.env is available at runtime in Vite
+  const env = (import.meta.env as Record<string, any>);
+  
+  const missingVars = requiredVars.filter(varName => !env[varName]);
+
+  if (missingVars.length > 0) {
+    console.error(
+      'Missing required Firebase environment variables:',
+      missingVars.join(', ')
+    );
+    throw new Error(
+      'Missing Firebase configuration. Please check your .env file and ensure all required variables are set.'
+    );
+  }
+  
+  return {
+    apiKey: env.VITE_FIREBASE_API_KEY || '',
+    authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || '',
+    projectId: env.VITE_FIREBASE_PROJECT_ID || '',
+    storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET || '',
+    messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+    appId: env.VITE_FIREBASE_APP_ID || '',
+    measurementId: env.VITE_FIREBASE_MEASUREMENT_ID || '',
+    databaseURL: env.VITE_FIREBASE_DATABASE_URL || ''
+  };
+}
+
+export const firebaseConfig: FirebaseConfig = getFirebaseConfig();
 
 // Types
 export interface User {
@@ -108,4 +154,16 @@ export interface TodoItem {
   priority: 'high' | 'medium' | 'low';
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface Material {
+  id: string;
+  title: string;
+  description?: string;
+  grade: '1' | '2' | '3'; // Grade level
+  fileUrl: string;
+  fileSize?: string;
+  fileName?: string;
+  createdBy: string;
+  createdAt: string;
 }
