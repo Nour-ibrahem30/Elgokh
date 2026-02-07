@@ -1,11 +1,11 @@
 "use strict";
 const firebaseConfig = {
-    apiKey: "AIzaSyCxKJoFBDVdEOExjVFbLhKrKHAjHxSKvWY",
-    authDomain: "mentor-teach.firebaseapp.com",
-    projectId: "mentor-teach",
-    storageBucket: "mentor-teach.appspot.com",
-    messagingSenderId: "654631576444",
-    appId: "1:654631576444:web:f4e1e58b46f65ef9206be0"
+    apiKey: "AIzaSyBmJJ5_wZ8X9QX9X9X9X9X9X9X9X9X9X9X",
+    authDomain: "philosopher-platform.firebaseapp.com",
+    projectId: "philosopher-platform",
+    storageBucket: "philosopher-platform.appspot.com",
+    messagingSenderId: "123456789012",
+    appId: "1:123456789012:web:65ef9206be0"
 };
 let app;
 let auth;
@@ -15,7 +15,7 @@ function initFirebase() {
         app = window.firebase.initializeApp(firebaseConfig);
         auth = window.firebase.auth(app);
         db = window.firebase.firestore(app);
-        console.log('✅ Firebase initialized successfully');
+        console.log('✅ Firebase initialized');
         return true;
     }
     return false;
@@ -31,22 +31,18 @@ const firebaseInitInterval = setInterval(() => {
     }
 }, 100);
 let currentUser = null;
+let todos = [
+    { id: '1', title: 'مراجعة الدرس الأول في الرياضيات', description: 'مراجعة شاملة للمفاهيم الأساسية', completed: false, priority: 'high', dueDate: '2024-02-20' },
+    { id: '2', title: 'حل تمارين الفيزياء', description: 'إنجاز التمارين المطلوبة', completed: true, priority: 'medium' },
+    { id: '3', title: 'قراءة الفصل الثالث من التاريخ', description: 'قراءة وتلخيص الأحداث المهمة', completed: false, priority: 'low', dueDate: '2024-02-25' }
+];
 function generateInitials(name) {
-    return name
-        .split(' ')
-        .map(w => w[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase();
+    return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 }
 function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    const icon = {
-        success: '✅',
-        error: '❌',
-        info: 'ℹ️'
-    }[type];
+    const icon = { success: '✅', error: '❌', info: 'ℹ️' }[type];
     toast.innerHTML = `
     <div class="toast-content">
       <span class="toast-icon">${icon}</span>
@@ -59,71 +55,31 @@ function showToast(message, type = 'info') {
         styles.id = 'toast-styles';
         styles.textContent = `
       .toast {
-        position: fixed;
-        top: 20px;
-        right: 20px;
+        position: fixed; top: 20px; right: 20px;
         background: rgba(30, 41, 59, 0.95);
         backdrop-filter: blur(10px);
-        border-radius: 12px;
-        padding: 1rem;
+        border-radius: 12px; padding: 1rem;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        z-index: 10000;
-        animation: slideInRight 0.3s ease;
-        max-width: 400px;
-        border-left: 4px solid;
+        z-index: 10000; animation: slideInRight 0.3s ease;
+        max-width: 400px; border-left: 4px solid;
       }
-      
       .toast-success { border-left-color: #10b981; }
       .toast-error { border-left-color: #ef4444; }
       .toast-info { border-left-color: #3b82f6; }
-      
-      .toast-content {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        color: #f1f5f9;
-      }
-      
-      .toast-icon {
-        font-size: 1.2rem;
-        flex-shrink: 0;
-      }
-      
-      .toast-message {
-        flex: 1;
-        font-size: 0.95rem;
-      }
-      
+      .toast-content { display: flex; align-items: center; gap: 0.75rem; color: #f1f5f9; }
+      .toast-icon { font-size: 1.2rem; flex-shrink: 0; }
+      .toast-message { flex: 1; font-size: 0.95rem; }
       .toast-close {
-        background: none;
-        border: none;
-        color: #94a3b8;
-        font-size: 1.2rem;
-        cursor: pointer;
-        padding: 0;
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: all 0.3s ease;
+        background: none; border: none; color: #94a3b8;
+        font-size: 1.2rem; cursor: pointer; padding: 0;
+        width: 24px; height: 24px; display: flex;
+        align-items: center; justify-content: center;
+        border-radius: 50%; transition: all 0.3s ease;
       }
-      
-      .toast-close:hover {
-        background: rgba(148, 163, 184, 0.2);
-        color: #f1f5f9;
-      }
-      
+      .toast-close:hover { background: rgba(148, 163, 184, 0.2); color: #f1f5f9; }
       @keyframes slideInRight {
-        from {
-          opacity: 0;
-          transform: translateX(100%);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
       }
     `;
         document.head.appendChild(styles);
@@ -145,33 +101,21 @@ function extractNameFromEmail(email) {
         .join(' ');
 }
 function updateProfileUI(name, email) {
-    console.log('🔄 updateProfileUI called with:', { name, email });
     if (!name || name.trim().length < 1) {
         name = extractNameFromEmail(email);
     }
-    const nameEl = document.getElementById('userName');
-    const emailEl = document.getElementById('userEmail');
-    const initialsEl = document.getElementById('userInitials');
-    console.log('📋 Found elements:', { nameEl: !!nameEl, emailEl: !!emailEl, initialsEl: !!initialsEl });
     const attempts = [0, 50, 100, 200, 500];
     attempts.forEach(delay => {
         setTimeout(() => {
             const nameEl = document.getElementById('userName');
             const emailEl = document.getElementById('userEmail');
             const initialsEl = document.getElementById('userInitials');
-            console.log(`[${delay}ms] Attempt to update:`, { nameEl: !!nameEl, emailEl: !!emailEl, initialsEl: !!initialsEl });
-            if (nameEl) {
+            if (nameEl)
                 nameEl.textContent = name;
-                console.log(`✅ Updated userName to: ${name}`);
-            }
-            if (emailEl) {
+            if (emailEl)
                 emailEl.textContent = email;
-                console.log(`✅ Updated userEmail to: ${email}`);
-            }
-            if (initialsEl) {
+            if (initialsEl)
                 initialsEl.textContent = generateInitials(name);
-                console.log(`✅ Updated userInitials to: ${generateInitials(name)}`);
-            }
         }, delay);
     });
 }
@@ -207,9 +151,7 @@ async function checkAuth() {
                         }
                     }
                     showToast('يجب تسجيل الدخول', 'error');
-                    setTimeout(() => {
-                        window.location.href = '/public/pages/login.html';
-                    }, 2000);
+                    setTimeout(() => window.location.href = '/public/pages/login.html', 2000);
                     resolve();
                     return;
                 }
@@ -242,198 +184,333 @@ async function checkAuth() {
                     resolve();
                 }
                 catch (err) {
-                    console.error(err);
-                    showToast('خطأ في تحميل بيانات المستخدم', 'error');
+                    console.error('Auth error:', err);
+                    showToast('حدث خطأ في المصادقة', 'error');
                     resolve();
                 }
             });
-        }, 50);
+        }, 100);
     });
 }
-async function saveProfileData(data) {
-    if (!currentUser) {
-        showToast('لم يتم العثور على المستخدم', 'error');
-        return;
-    }
-    try {
-        const userRef = window.firebase.firestore.doc(db, 'users', currentUser.uid);
-        await window.firebase.firestore.updateDoc(userRef, {
-            name: data.name,
-            phone: data.phone || '',
-            bio: data.bio || '',
-            updatedAt: new Date().toISOString(),
-        });
-        currentUser.name = data.name;
-        updateProfileUI(currentUser.name, currentUser.email);
-        showToast('تم حفظ البيانات بنجاح', 'success');
-    }
-    catch (e) {
-        console.error('Error saving profile:', e);
-        showToast('فشل حفظ البيانات', 'error');
-    }
-}
-async function loadTodos() {
+async function loadProgress() {
     if (!currentUser)
         return;
-    const list = document.getElementById('todoList');
-    if (!list)
+    const completedVideos = 5, totalVideos = 20;
+    const completedExams = 3, totalExams = 10;
+    const activeTodos = 7;
+    const elements = {
+        completedVideos: document.getElementById('completedVideos'),
+        completedExams: document.getElementById('completedExams'),
+        totalVideosCount: document.getElementById('totalVideosCount'),
+        totalExamsCount: document.getElementById('totalExamsCount'),
+        watchedVideos: document.getElementById('watchedVideos'),
+        passedExams: document.getElementById('passedExams'),
+        totalTodos: document.getElementById('totalTodos'),
+        videoProgress: document.getElementById('videoProgress'),
+        examProgress: document.getElementById('examProgress'),
+        videoProgressBar: document.getElementById('videoProgressBar'),
+        examProgressBar: document.getElementById('examProgressBar')
+    };
+    if (elements.completedVideos)
+        elements.completedVideos.textContent = completedVideos.toString();
+    if (elements.completedExams)
+        elements.completedExams.textContent = completedExams.toString();
+    if (elements.totalVideosCount)
+        elements.totalVideosCount.textContent = totalVideos.toString();
+    if (elements.totalExamsCount)
+        elements.totalExamsCount.textContent = totalExams.toString();
+    if (elements.watchedVideos)
+        elements.watchedVideos.textContent = completedVideos.toString();
+    if (elements.passedExams)
+        elements.passedExams.textContent = completedExams.toString();
+    if (elements.totalTodos)
+        elements.totalTodos.textContent = activeTodos.toString();
+    const videoProgress = Math.round((completedVideos / totalVideos) * 100);
+    const examProgress = Math.round((completedExams / totalExams) * 100);
+    if (elements.videoProgress)
+        elements.videoProgress.textContent = videoProgress + '%';
+    if (elements.examProgress)
+        elements.examProgress.textContent = examProgress + '%';
+    if (elements.videoProgressBar)
+        elements.videoProgressBar.style.width = videoProgress + '%';
+    if (elements.examProgressBar)
+        elements.examProgressBar.style.width = examProgress + '%';
+}
+function loadTodos() {
+    const todoList = document.getElementById('todoList');
+    if (!todoList)
         return;
-    list.innerHTML = '';
-    try {
-        const q = window.firebase.firestore.query(window.firebase.firestore.collection(db, 'todos'), window.firebase.firestore.where('userId', '==', currentUser.uid));
-        const snap = await window.firebase.firestore.getDocs(q);
-        if (snap.empty) {
-            list.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 2rem;">لا توجد مهام حالياً</p>';
+    todoList.innerHTML = '';
+    todos.forEach(todo => {
+        const todoElement = document.createElement('div');
+        todoElement.className = `todo-item ${todo.completed ? 'completed' : ''} priority-${todo.priority}`;
+        const priorityLabels = { high: 'عالية', medium: 'متوسطة', low: 'منخفضة' };
+        todoElement.innerHTML = `
+      <div class="todo-checkbox">
+        <input type="checkbox" ${todo.completed ? 'checked' : ''} data-id="${todo.id}">
+      </div>
+      <div class="todo-content">
+        <h4 class="todo-title">${todo.title}</h4>
+        ${todo.description ? `<p class="todo-description">${todo.description}</p>` : ''}
+        <div class="todo-meta">
+          <span class="todo-priority ${todo.priority}">${priorityLabels[todo.priority]}</span>
+          ${todo.dueDate ? `<span class="todo-due">📅 ${todo.dueDate}</span>` : ''}
+        </div>
+      </div>
+      <div class="todo-actions">
+        <button class="btn-icon delete-todo" data-id="${todo.id}" title="حذف المهمة">🗑️</button>
+      </div>
+    `;
+        todoList.appendChild(todoElement);
+    });
+}
+function loadExamResults() {
+    const container = document.getElementById('examResults');
+    if (!container)
+        return;
+    const sampleResults = [
+        { title: 'امتحان الرياضيات', score: 85, total: 100, date: '2024-02-10' },
+        { title: 'امتحان الفيزياء', score: 92, total: 100, date: '2024-02-08' },
+        { title: 'امتحان الكيمياء', score: 78, total: 100, date: '2024-02-05' }
+    ];
+    container.innerHTML = '';
+    sampleResults.forEach(result => {
+        const percentage = Math.round((result.score / result.total) * 100);
+        const passed = percentage >= 50;
+        const resultElement = document.createElement('div');
+        resultElement.className = `result-item ${passed ? 'passed' : 'failed'}`;
+        resultElement.innerHTML = `
+      <div class="result-info">
+        <h4>📝 ${result.title}</h4>
+        <p>📅 ${result.date}</p>
+      </div>
+      <div class="result-score">
+        <span class="score-value">${percentage}%</span>
+        <span class="score-label">${result.score}/${result.total}</span>
+      </div>
+      <div class="result-status">
+        <span class="${passed ? 'badge-success' : 'badge-danger'}">
+          ${passed ? '✅ ناجح' : '❌ راسب'}
+        </span>
+      </div>
+    `;
+        container.appendChild(resultElement);
+    });
+}
+function loadAchievements() {
+    const container = document.getElementById('achievementsList');
+    if (!container)
+        return;
+    const achievements = [
+        { title: 'أول خطوة', description: 'شاهد أول فيديو تعليمي', icon: '🎬', unlocked: true, progress: 100 },
+        { title: 'خبير المشاهدة', description: 'شاهد 10 فيديوهات تعليمية', icon: '🏆', unlocked: false, progress: 50 },
+        { title: 'أول امتحان', description: 'اجتز أول امتحان بنجاح', icon: '📝', unlocked: true, progress: 100 }
+    ];
+    container.innerHTML = '';
+    achievements.forEach(achievement => {
+        const card = document.createElement('div');
+        card.className = `achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}`;
+        card.innerHTML = `
+      <div class="achievement-icon ${achievement.unlocked ? 'unlocked' : 'locked'}">
+        ${achievement.unlocked ? achievement.icon : '🔒'}
+      </div>
+      <h3 class="achievement-title">${achievement.title}</h3>
+      <p class="achievement-description">${achievement.description}</p>
+      <div class="achievement-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${achievement.progress}%"></div>
+        </div>
+        <span class="progress-text">${achievement.progress}%</span>
+      </div>
+      ${achievement.unlocked ? '<div class="achievement-badge">مكتمل</div>' : ''}
+    `;
+        container.appendChild(card);
+    });
+}
+function showAddTodoModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>➕ إضافة مهمة جديدة</h2>
+        <button class="modal-close">×</button>
+      </div>
+      <form id="addTodoForm">
+        <div class="form-group">
+          <label>عنوان المهمة *</label>
+          <input type="text" id="todoTitle" required placeholder="مثال: مراجعة الدرس الأول">
+        </div>
+        <div class="form-group">
+          <label>وصف المهمة</label>
+          <textarea id="todoDescription" placeholder="تفاصيل إضافية عن المهمة..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>الأولوية</label>
+            <select id="todoPriority">
+              <option value="low">🟢 منخفضة</option>
+              <option value="medium" selected>🟡 متوسطة</option>
+              <option value="high">🔴 عالية</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>تاريخ الاستحقاق</label>
+            <input type="date" id="todoDueDate">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">✅ إضافة المهمة</button>
+          <button type="button" class="btn btn-secondary close-modal">❌ إلغاء</button>
+        </div>
+      </form>
+    </div>
+  `;
+    if (!document.getElementById('modal-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'modal-styles';
+        styles.textContent = `
+      .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+      .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+      .modal-content { background: #1e293b; border-radius: 12px; padding: 2rem; max-width: 500px; width: 90%; position: relative; }
+      .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+      .modal-header h2 { color: #f1f5f9; margin: 0; }
+      .modal-close { background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; }
+      .form-group { margin-bottom: 1rem; }
+      .form-group label { display: block; color: #f1f5f9; margin-bottom: 0.5rem; }
+      .form-group input, .form-group textarea, .form-group select {
+        width: 100%; padding: 0.75rem; border: 1px solid #475569; border-radius: 8px;
+        background: #334155; color: #f1f5f9; font-family: inherit;
+      }
+      .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+      .form-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+      .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; }
+      .btn-primary { background: #3b82f6; color: white; }
+      .btn-secondary { background: #6b7280; color: white; }
+    `;
+        document.head.appendChild(styles);
+    }
+    document.body.appendChild(modal);
+    const form = modal.querySelector('#addTodoForm');
+    const closeBtn = modal.querySelector('.modal-close');
+    const cancelBtn = modal.querySelector('.close-modal');
+    const overlay = modal.querySelector('.modal-overlay');
+    const closeModal = () => modal.remove();
+    form?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('todoTitle').value.trim();
+        const description = document.getElementById('todoDescription').value.trim();
+        const priority = document.getElementById('todoPriority').value;
+        const dueDate = document.getElementById('todoDueDate').value;
+        if (!title) {
+            showToast('يرجى إدخال عنوان المهمة', 'error');
             return;
         }
-        snap.forEach((docSnap) => {
-            const todo = docSnap.data();
-            const div = document.createElement('div');
-            div.className = `todo-item ${todo.completed ? 'completed' : ''}`;
-            div.innerHTML = `
-        <div class="todo-checkbox">
-          <input type="checkbox" ${todo.completed ? 'checked' : ''} data-id="${docSnap.id}">
-        </div>
-        <div class="todo-content">
-          <h4 class="todo-title">${todo.title}</h4>
-          ${todo.description ? `<p class="todo-description">${todo.description}</p>` : ''}
-        </div>
-        <div class="todo-actions">
-          <button class="delete-todo" data-id="${docSnap.id}" aria-label="حذف المهمة">🗑️</button>
-        </div>
-      `;
-            const checkbox = div.querySelector('input[type="checkbox"]');
-            const deleteBtn = div.querySelector('.delete-todo');
-            checkbox.addEventListener('change', async () => {
-                try {
-                    const todoRef = window.firebase.firestore.doc(db, 'todos', docSnap.id);
-                    await window.firebase.firestore.updateDoc(todoRef, {
-                        completed: checkbox.checked,
-                        updatedAt: new Date().toISOString()
-                    });
-                    div.classList.toggle('completed');
-                    showToast(checkbox.checked ? 'تم إكمال المهمة' : 'تم إلغاء الإكمال', 'success');
-                }
-                catch (error) {
-                    console.error('Error updating todo:', error);
-                    showToast('حدث خطأ في تحديث المهمة', 'error');
-                }
-            });
-            deleteBtn.addEventListener('click', async () => {
-                if (confirm('هل أنت متأكد من حذف هذه المهمة؟')) {
-                    try {
-                        const todoRef = window.firebase.firestore.doc(db, 'todos', docSnap.id);
-                        await window.firebase.firestore.deleteDoc(todoRef);
-                        div.remove();
-                        showToast('تم حذف المهمة بنجاح', 'success');
-                    }
-                    catch (error) {
-                        console.error('Error deleting todo:', error);
-                        showToast('حدث خطأ في حذف المهمة', 'error');
-                    }
-                }
-            });
-            list.appendChild(div);
-        });
-    }
-    catch (error) {
-        console.error('Error loading todos:', error);
-        list.innerHTML = '<p style="color: #ef4444;">حدث خطأ في تحميل المهام</p>';
-    }
-}
-async function addTodo(title, description, priority = 'medium') {
-    if (!currentUser) {
-        showToast('يجب تسجيل الدخول أولاً', 'error');
-        return;
-    }
-    if (!title.trim()) {
-        showToast('يرجى إدخال عنوان المهمة', 'error');
-        return;
-    }
-    try {
-        await window.firebase.firestore.addDoc(window.firebase.firestore.collection(db, 'todos'), {
-            userId: currentUser.uid,
-            title: title.trim(),
-            description: description?.trim() || '',
+        const newTodo = {
+            id: Date.now().toString(),
+            title,
+            description: description || undefined,
             completed: false,
-            priority,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        });
-        showToast('تم إضافة المهمة بنجاح', 'success');
+            priority: priority,
+            dueDate: dueDate || undefined
+        };
+        todos.push(newTodo);
         loadTodos();
-    }
-    catch (error) {
-        console.error('Error adding todo:', error);
-        showToast('حدث خطأ في إضافة المهمة', 'error');
-    }
+        closeModal();
+        showToast('تم إضافة المهمة بنجاح!', 'success');
+    });
+    closeBtn?.addEventListener('click', closeModal);
+    cancelBtn?.addEventListener('click', closeModal);
+    overlay?.addEventListener('click', closeModal);
+    setTimeout(() => {
+        document.getElementById('todoTitle')?.focus();
+    }, 100);
+}
+function switchTab(tabName) {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabButtons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-tab') === tabName) {
+            btn.classList.add('active');
+        }
+    });
+    tabContents.forEach(content => {
+        content.classList.remove('active');
+        if (content.id === tabName + 'Tab') {
+            content.classList.add('active');
+        }
+    });
+    if (tabName === 'todos')
+        loadTodos();
+    else if (tabName === 'results')
+        loadExamResults();
+    else if (tabName === 'achievements')
+        loadAchievements();
 }
 function initializeEventListeners() {
-    const saveProfileBtn = document.getElementById('saveProfileBtn');
-    if (saveProfileBtn) {
-        saveProfileBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const nameInput = document.getElementById('editName');
-            const phoneInput = document.getElementById('editPhone');
-            const bioInput = document.getElementById('editBio');
-            if (!nameInput?.value.trim()) {
-                showToast('يرجى إدخال الاسم', 'error');
-                return;
-            }
-            await saveProfileData({
-                name: nameInput.value.trim(),
-                phone: phoneInput?.value.trim() || '',
-                bio: bioInput?.value.trim() || ''
-            });
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabName = btn.getAttribute('data-tab');
+            if (tabName)
+                switchTab(tabName);
         });
-    }
+    });
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            loadTodos();
+        });
+    });
     const addTodoBtn = document.getElementById('addTodoBtn');
     if (addTodoBtn) {
-        addTodoBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const title = prompt('عنوان المهمة:');
-            if (!title)
-                return;
-            const description = prompt('الوصف (اختياري):') || undefined;
-            addTodo(title, description);
+        addTodoBtn.addEventListener('click', () => {
+            showAddTodoModal();
         });
     }
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-                try {
-                    await auth.signOut();
-                    localStorage.removeItem('currentUser');
-                    localStorage.removeItem('currentUserEmail');
-                    localStorage.removeItem('userRole');
-                    showToast('تم تسجيل الخروج بنجاح', 'success');
-                    setTimeout(() => {
-                        window.location.href = '/public/pages/login.html';
-                    }, 1000);
-                }
-                catch (error) {
-                    console.error('Logout error:', error);
-                    showToast('حدث خطأ في تسجيل الخروج', 'error');
+    document.addEventListener('click', (e) => {
+        const target = e.target;
+        if (target.type === 'checkbox' && target.dataset.id) {
+            const todoItem = target.closest('.todo-item');
+            const todoId = target.dataset.id;
+            if (todoItem && todoId) {
+                const todo = todos.find(t => t.id === todoId);
+                if (todo) {
+                    todo.completed = target.checked;
+                    todoItem.classList.toggle('completed', todo.completed);
+                    showToast(todo.completed ? 'تم إكمال المهمة!' : 'تم إلغاء إكمال المهمة', 'success');
                 }
             }
-        });
-    }
+        }
+        if (target.classList.contains('delete-todo')) {
+            const todoItem = target.closest('.todo-item');
+            const todoId = target.dataset.id;
+            if (todoItem && todoId) {
+                todos = todos.filter(todo => todo.id !== todoId);
+                todoItem.remove();
+                showToast('تم حذف المهمة', 'success');
+            }
+        }
+    });
 }
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 Initializing profile page...');
+    console.log('🚀 Profile page loading...');
     try {
         await checkAuth();
         if (currentUser) {
-            console.log('✅ User authenticated');
-            await loadTodos();
+            console.log('✅ User authenticated:', currentUser.name);
+            await loadProgress();
             initializeEventListeners();
-            console.log('🎉 Profile page ready');
+            switchTab('todos');
+            console.log('🎉 Profile page initialized successfully');
         }
     }
     catch (error) {
-        console.error('❌ Error initializing:', error);
+        console.error('❌ Error initializing profile:', error);
         showToast('حدث خطأ في تحميل الصفحة', 'error');
     }
 });

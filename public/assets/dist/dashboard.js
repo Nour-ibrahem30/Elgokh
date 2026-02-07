@@ -111,14 +111,26 @@ async function loadVideosManagement() {
         const snapshot = await getDocs(query(collection(db, 'lessons'), orderBy('createdAt', 'desc')));
         if (snapshot.empty) {
             container.innerHTML = '<div class="empty-state"><p>لا توجد فيديوهات</p></div>';
+            window.videos = [];
             return;
         }
-        container.innerHTML = '';
+        const videosData = [];
         snapshot.forEach((docSnap) => {
             const video = { id: docSnap.id, ...docSnap.data() };
+            videosData.push({
+                id: video.id,
+                title: video.title,
+                videoUrl: video.videoUrl,
+                notes: video.notes,
+                source: 'youtube',
+                duration: 0,
+                createdAt: video.createdAt
+            });
             const item = createManagementItem(video, 'video');
             container.appendChild(item);
         });
+        window.videos = videosData;
+        console.log('Videos loaded from Firebase:', videosData.length);
     }
     catch (error) {
         console.error('Error loading videos:', error);
@@ -132,14 +144,24 @@ async function loadExamsManagement() {
         const snapshot = await getDocs(query(collection(db, 'exams'), orderBy('createdAt', 'desc')));
         if (snapshot.empty) {
             container.innerHTML = '<div class="empty-state"><p>لا توجد امتحانات</p></div>';
+            window.exams = [];
             return;
         }
-        container.innerHTML = '';
+        const examsData = [];
         snapshot.forEach((docSnap) => {
             const exam = { id: docSnap.id, ...docSnap.data() };
+            examsData.push({
+                id: exam.id,
+                title: exam.title,
+                duration: exam.duration || 0,
+                questions: exam.questions?.length || 0,
+                createdAt: exam.createdAt
+            });
             const item = createManagementItem(exam, 'exam');
             container.appendChild(item);
         });
+        window.exams = examsData;
+        console.log('Exams loaded from Firebase:', examsData.length);
     }
     catch (error) {
         console.error('Error loading exams:', error);
@@ -153,14 +175,24 @@ async function loadNotesManagement() {
         const snapshot = await getDocs(query(collection(db, 'notes'), orderBy('createdAt', 'desc')));
         if (snapshot.empty) {
             container.innerHTML = '<div class="empty-state"><p>لا توجد ملاحظات</p></div>';
+            window.notes = [];
             return;
         }
-        container.innerHTML = '';
+        const notesData = [];
         snapshot.forEach((docSnap) => {
             const note = { id: docSnap.id, ...docSnap.data() };
+            notesData.push({
+                id: note.id,
+                title: note.content.substring(0, 50),
+                content: note.content,
+                priority: note.priority || 'medium',
+                createdAt: note.createdAt
+            });
             const item = createManagementItem(note, 'note');
             container.appendChild(item);
         });
+        window.notes = notesData;
+        console.log('Notes loaded from Firebase:', notesData.length);
     }
     catch (error) {
         console.error('Error loading notes:', error);
@@ -368,15 +400,32 @@ async function addVideo(title, videoUrl, notes) {
             window.showToast('خطأ: لم يتم تعيين المستخدم', 'error');
             return;
         }
-        await addDoc(collection(db, 'lessons'), {
+        const docRef = await addDoc(collection(db, 'lessons'), {
             title,
             videoUrl,
             notes,
             createdBy: currentUser.uid,
             createdAt: new Date().toISOString()
         });
+        const newVideo = {
+            id: docRef.id,
+            title,
+            videoUrl,
+            notes,
+            source: 'youtube',
+            duration: 0,
+            createdAt: new Date().toISOString()
+        };
+        if (window.videos) {
+            window.videos.unshift(newVideo);
+            if (typeof window.renderVideos === 'function') {
+                window.renderVideos();
+            }
+        }
+        else {
+            await loadVideosManagement();
+        }
         window.showToast('تم إضافة الفيديو بنجاح!', 'success');
-        loadVideosManagement();
     }
     catch (error) {
         console.error('Error adding video:', error);
@@ -408,7 +457,7 @@ async function addExam(title, duration) {
             window.showToast('خطأ: لم يتم تعيين المستخدم', 'error');
             return;
         }
-        await addDoc(collection(db, 'exams'), {
+        const docRef = await addDoc(collection(db, 'exams'), {
             title,
             duration,
             questions: [],
@@ -416,8 +465,24 @@ async function addExam(title, duration) {
             createdBy: currentUser.uid,
             createdAt: new Date().toISOString()
         });
+        const newExam = {
+            id: docRef.id,
+            title,
+            duration,
+            questions: 0,
+            description: '',
+            createdAt: new Date().toISOString()
+        };
+        if (window.exams) {
+            window.exams.unshift(newExam);
+            if (typeof window.renderExams === 'function') {
+                window.renderExams();
+            }
+        }
+        else {
+            await loadExamsManagement();
+        }
         window.showToast('تم إضافة الامتحان بنجاح!', 'success');
-        loadExamsManagement();
     }
     catch (error) {
         console.error('Error adding exam:', error);
@@ -448,14 +513,29 @@ async function addNote(title, content) {
             window.showToast('خطأ: لم يتم تعيين المستخدم', 'error');
             return;
         }
-        await addDoc(collection(db, 'notes'), {
+        const docRef = await addDoc(collection(db, 'notes'), {
             title,
             content,
             createdBy: currentUser.uid,
             createdAt: new Date().toISOString()
         });
+        const newNote = {
+            id: docRef.id,
+            title,
+            content,
+            priority: 'متوسطة',
+            createdAt: new Date().toISOString()
+        };
+        if (window.notes) {
+            window.notes.unshift(newNote);
+            if (typeof window.renderNotes === 'function') {
+                window.renderNotes();
+            }
+        }
+        else {
+            await loadNotesManagement();
+        }
         window.showToast('تم إضافة الملاحظة بنجاح!', 'success');
-        loadNotesManagement();
     }
     catch (error) {
         console.error('Error adding note:', error);

@@ -127,15 +127,31 @@ async function loadVideosManagement() {
     
     if (snapshot.empty) {
       container.innerHTML = '<div class="empty-state"><p>لا توجد فيديوهات</p></div>';
+      // Update global videos array
+      (window as any).videos = [];
       return;
     }
 
-    container.innerHTML = '';
+    // Update global videos array with Firebase data
+    const videosData: any[] = [];
     snapshot.forEach((docSnap) => {
       const video = { id: docSnap.id, ...docSnap.data() } as Lesson;
+      videosData.push({
+        id: video.id,
+        title: video.title,
+        videoUrl: video.videoUrl,
+        notes: video.notes,
+        source: 'youtube',
+        duration: 0,
+        createdAt: video.createdAt
+      });
       const item = createManagementItem(video, 'video');
       container.appendChild(item);
     });
+    
+    // Update global scope
+    (window as any).videos = videosData;
+    console.log('Videos loaded from Firebase:', videosData.length);
   } catch (error) {
     console.error('Error loading videos:', error);
     container.innerHTML = '<div class="error-state"><p>حدث خطأ</p></div>';
@@ -151,15 +167,28 @@ async function loadExamsManagement() {
     
     if (snapshot.empty) {
       container.innerHTML = '<div class="empty-state"><p>لا توجد امتحانات</p></div>';
+      (window as any).exams = [];
       return;
     }
 
-    container.innerHTML = '';
+    // Update global exams array with Firebase data
+    const examsData: any[] = [];
     snapshot.forEach((docSnap) => {
       const exam = { id: docSnap.id, ...docSnap.data() } as Exam;
+      examsData.push({
+        id: exam.id,
+        title: exam.title,
+        duration: exam.duration || 0,
+        questions: exam.questions?.length || 0,
+        createdAt: exam.createdAt
+      });
       const item = createManagementItem(exam, 'exam');
       container.appendChild(item);
     });
+
+    // Update global scope
+    (window as any).exams = examsData;
+    console.log('Exams loaded from Firebase:', examsData.length);
   } catch (error) {
     console.error('Error loading exams:', error);
     container.innerHTML = '<div class="error-state"><p>حدث خطأ</p></div>';
@@ -175,15 +204,28 @@ async function loadNotesManagement() {
     
     if (snapshot.empty) {
       container.innerHTML = '<div class="empty-state"><p>لا توجد ملاحظات</p></div>';
+      (window as any).notes = [];
       return;
     }
 
-    container.innerHTML = '';
+    // Update global notes array with Firebase data
+    const notesData: any[] = [];
     snapshot.forEach((docSnap) => {
       const note = { id: docSnap.id, ...docSnap.data() } as Note;
+      notesData.push({
+        id: note.id,
+        title: note.content.substring(0, 50),
+        content: note.content,
+        priority: note.priority || 'medium',
+        createdAt: note.createdAt
+      });
       const item = createManagementItem(note, 'note');
       container.appendChild(item);
     });
+
+    // Update global scope
+    (window as any).notes = notesData;
+    console.log('Notes loaded from Firebase:', notesData.length);
   } catch (error) {
     console.error('Error loading notes:', error);
     container.innerHTML = '<div class="error-state"><p>حدث خطأ</p></div>';
@@ -409,7 +451,7 @@ async function addVideo(title: string, videoUrl: string, notes: string) {
       return;
     }
 
-    await addDoc(collection(db, 'lessons'), {
+    const docRef = await addDoc(collection(db, 'lessons'), {
       title,
       videoUrl,
       notes,
@@ -417,8 +459,29 @@ async function addVideo(title: string, videoUrl: string, notes: string) {
       createdAt: new Date().toISOString()
     });
 
+    // Update global array if available
+    const newVideo = {
+      id: docRef.id,
+      title,
+      videoUrl,
+      notes,
+      source: 'youtube',
+      duration: 0,
+      createdAt: new Date().toISOString()
+    };
+
+    if ((window as any).videos) {
+      (window as any).videos.unshift(newVideo);
+      // Call renderVideos if it exists
+      if (typeof (window as any).renderVideos === 'function') {
+        (window as any).renderVideos();
+      }
+    } else {
+      // If global videos array doesn't exist, reload
+      await loadVideosManagement();
+    }
+
     (window as any).showToast('تم إضافة الفيديو بنجاح!', 'success');
-    loadVideosManagement();
   } catch (error) {
     console.error('Error adding video:', error);
     (window as any).showToast('حدث خطأ أثناء إضافة الفيديو', 'error');
@@ -452,7 +515,7 @@ async function addExam(title: string, duration: number) {
       return;
     }
 
-    await addDoc(collection(db, 'exams'), {
+    const docRef = await addDoc(collection(db, 'exams'), {
       title,
       duration,
       questions: [],
@@ -461,8 +524,28 @@ async function addExam(title: string, duration: number) {
       createdAt: new Date().toISOString()
     });
 
+    // Update global array if available
+    const newExam = {
+      id: docRef.id,
+      title,
+      duration,
+      questions: 0,
+      description: '',
+      createdAt: new Date().toISOString()
+    };
+
+    if ((window as any).exams) {
+      (window as any).exams.unshift(newExam);
+      // Call renderExams if it exists
+      if (typeof (window as any).renderExams === 'function') {
+        (window as any).renderExams();
+      }
+    } else {
+      // If global exams array doesn't exist, reload
+      await loadExamsManagement();
+    }
+
     (window as any).showToast('تم إضافة الامتحان بنجاح!', 'success');
-    loadExamsManagement();
   } catch (error) {
     console.error('Error adding exam:', error);
     (window as any).showToast('حدث خطأ أثناء إضافة الامتحان', 'error');
@@ -494,15 +577,34 @@ async function addNote(title: string, content: string) {
       return;
     }
 
-    await addDoc(collection(db, 'notes'), {
+    const docRef = await addDoc(collection(db, 'notes'), {
       title,
       content,
       createdBy: currentUser.uid,
       createdAt: new Date().toISOString()
     });
 
+    // Update global array if available
+    const newNote = {
+      id: docRef.id,
+      title,
+      content,
+      priority: 'متوسطة',
+      createdAt: new Date().toISOString()
+    };
+
+    if ((window as any).notes) {
+      (window as any).notes.unshift(newNote);
+      // Call renderNotes if it exists
+      if (typeof (window as any).renderNotes === 'function') {
+        (window as any).renderNotes();
+      }
+    } else {
+      // If global notes array doesn't exist, reload
+      await loadNotesManagement();
+    }
+
     (window as any).showToast('تم إضافة الملاحظة بنجاح!', 'success');
-    loadNotesManagement();
   } catch (error) {
     console.error('Error adding note:', error);
     (window as any).showToast('حدث خطأ أثناء إضافة الملاحظة', 'error');
