@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -357,7 +357,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyAU0CCiQNrPEYpTNU4rAwmOmPUZnjb2FoU",
@@ -494,7 +494,7 @@
             submitExam();
         });
 
-        function submitExam() {
+        async function submitExam() {
             clearInterval(timerInterval);
             
             let correct = 0;
@@ -510,6 +510,31 @@
             });
 
             const percentage = Math.round((correct / examData.questions.length) * 100);
+            const passed = percentage >= 50; // Pass threshold is 50%
+
+            // Save exam result to Firestore
+            try {
+                const user = auth.currentUser;
+                if (user) {
+                    const resultRef = window.firebase.firestore.doc(db, 'examResults', `${user.uid}_${examId}_${Date.now()}`);
+                    await window.firebase.firestore.setDoc(resultRef, {
+                        userId: user.uid,
+                        examId: examId,
+                        examTitle: examData.title,
+                        score: percentage,
+                        correctAnswers: correct,
+                        incorrectAnswers: incorrect,
+                        totalQuestions: examData.questions.length,
+                        passed: passed,
+                        completedAt: new Date().toISOString(),
+                        timeSpent: (examData.duration * 60) - timeRemaining, // seconds
+                        answers: userAnswers
+                    });
+                    console.log('✅ Exam result saved to Firestore');
+                }
+            } catch (error) {
+                console.error('Error saving exam result:', error);
+            }
 
             // Hide exam, show results
             document.getElementById('examContent').style.display = 'none';
@@ -553,5 +578,11 @@
         // Load exam on page load
         loadExam();
     </script>
+
+    <!-- Mobile Menu Script -->
+    <script src="../assets/js/mobile-menu.js"></script>
+
+    <!-- Motivational Messages -->
+    <script src="../assets/dist/motivational-toast.js"></script>
 </body>
 </html>

@@ -45,9 +45,17 @@ service cloud.firestore {
     // Exam Results
     match /examResults/{resultId} {
       allow read: if isAuthenticated() && 
-                     (isOwner(resource.data.studentId) || isTeacher());
-      allow create: if isAuthenticated() && isOwner(request.resource.data.studentId);
+                     (isOwner(resource.data.userId) || isTeacher());
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId);
       allow update, delete: if isTeacher();
+    }
+    
+    // Video Watches - Track which videos students have watched
+    match /videoWatches/{watchId} {
+      allow read: if isAuthenticated() && 
+                     (isOwner(resource.data.userId) || isTeacher());
+      allow create, update: if isAuthenticated() && isOwner(request.resource.data.userId);
+      allow delete: if isTeacher();
     }
     
     // Notes collection

@@ -222,40 +222,93 @@ async function checkAuth() {
 async function loadProgress() {
   if (!currentUser) return;
   
-  const completedVideos = 5, totalVideos = 20;
-  const completedExams = 3, totalExams = 10;
-  const activeTodos = 7;
-  
-  const elements = {
-    completedVideos: document.getElementById('completedVideos'),
-    completedExams: document.getElementById('completedExams'),
-    totalVideosCount: document.getElementById('totalVideosCount'),
-    totalExamsCount: document.getElementById('totalExamsCount'),
-    watchedVideos: document.getElementById('watchedVideos'),
-    passedExams: document.getElementById('passedExams'),
-    totalTodos: document.getElementById('totalTodos'),
-    videoProgress: document.getElementById('videoProgress'),
-    examProgress: document.getElementById('examProgress'),
-    videoProgressBar: document.getElementById('videoProgressBar'),
-    examProgressBar: document.getElementById('examProgressBar')
-  };
-  
-  if (elements.completedVideos) elements.completedVideos.textContent = completedVideos.toString();
-  if (elements.completedExams) elements.completedExams.textContent = completedExams.toString();
-  if (elements.totalVideosCount) elements.totalVideosCount.textContent = totalVideos.toString();
-  if (elements.totalExamsCount) elements.totalExamsCount.textContent = totalExams.toString();
-  if (elements.watchedVideos) elements.watchedVideos.textContent = completedVideos.toString();
-  if (elements.passedExams) elements.passedExams.textContent = completedExams.toString();
-  if (elements.totalTodos) elements.totalTodos.textContent = activeTodos.toString();
-  
-  const videoProgress = Math.round((completedVideos / totalVideos) * 100);
-  const examProgress = Math.round((completedExams / totalExams) * 100);
-  
-  if (elements.videoProgress) elements.videoProgress.textContent = videoProgress + '%';
-  if (elements.examProgress) elements.examProgress.textContent = examProgress + '%';
-  
-  if (elements.videoProgressBar) elements.videoProgressBar.style.width = videoProgress + '%';
-  if (elements.examProgressBar) elements.examProgressBar.style.width = examProgress + '%';
+  try {
+    const userId = currentUser.uid;
+    
+    // Load total counts from Firebase
+    const videosSnapshot = await window.firebase.firestore.collection(db, 'videos').get();
+    const examsSnapshot = await window.firebase.firestore.collection(db, 'exams').get();
+    
+    const totalVideos = videosSnapshot.size;
+    const totalExams = examsSnapshot.size;
+    
+    // Load user's completed videos
+    const videoWatchesQuery = window.firebase.firestore.collection(db, 'videoWatches')
+      .where('userId', '==', userId);
+    const videoWatchesSnapshot = await videoWatchesQuery.get();
+    const completedVideos = videoWatchesSnapshot.size;
+    
+    // Load user's passed exams
+    const examResultsQuery = window.firebase.firestore.collection(db, 'examResults')
+      .where('userId', '==', userId)
+      .where('passed', '==', true);
+    const examResultsSnapshot = await examResultsQuery.get();
+    const passedExams = examResultsSnapshot.size;
+    
+    // Count active todos
+    const activeTodos = todos.filter(t => !t.completed).length;
+    
+    const elements = {
+      completedVideos: document.getElementById('completedVideos'),
+      completedExams: document.getElementById('completedExams'),
+      totalVideosCount: document.getElementById('totalVideosCount'),
+      totalExamsCount: document.getElementById('totalExamsCount'),
+      watchedVideos: document.getElementById('watchedVideos'),
+      passedExams: document.getElementById('passedExams'),
+      totalTodos: document.getElementById('totalTodos'),
+      videoProgress: document.getElementById('videoProgress'),
+      examProgress: document.getElementById('examProgress'),
+      videoProgressBar: document.getElementById('videoProgressBar'),
+      examProgressBar: document.getElementById('examProgressBar')
+    };
+    
+    if (elements.completedVideos) elements.completedVideos.textContent = completedVideos.toString();
+    if (elements.completedExams) elements.completedExams.textContent = passedExams.toString();
+    if (elements.totalVideosCount) elements.totalVideosCount.textContent = totalVideos.toString();
+    if (elements.totalExamsCount) elements.totalExamsCount.textContent = totalExams.toString();
+    if (elements.watchedVideos) elements.watchedVideos.textContent = completedVideos.toString();
+    if (elements.passedExams) elements.passedExams.textContent = passedExams.toString();
+    if (elements.totalTodos) elements.totalTodos.textContent = activeTodos.toString();
+    
+    const videoProgress = totalVideos > 0 ? Math.round((completedVideos / totalVideos) * 100) : 0;
+    const examProgress = totalExams > 0 ? Math.round((passedExams / totalExams) * 100) : 0;
+    
+    if (elements.videoProgress) elements.videoProgress.textContent = videoProgress + '%';
+    if (elements.examProgress) elements.examProgress.textContent = examProgress + '%';
+    
+    if (elements.videoProgressBar) elements.videoProgressBar.style.width = videoProgress + '%';
+    if (elements.examProgressBar) elements.examProgressBar.style.width = examProgress + '%';
+    
+    console.log('✅ Progress loaded:', { completedVideos, totalVideos, passedExams, totalExams });
+  } catch (error) {
+    console.error('Error loading progress:', error);
+    // Fallback to showing zeros if error
+    const elements = {
+      completedVideos: document.getElementById('completedVideos'),
+      completedExams: document.getElementById('completedExams'),
+      totalVideosCount: document.getElementById('totalVideosCount'),
+      totalExamsCount: document.getElementById('totalExamsCount'),
+      watchedVideos: document.getElementById('watchedVideos'),
+      passedExams: document.getElementById('passedExams'),
+      totalTodos: document.getElementById('totalTodos'),
+      videoProgress: document.getElementById('videoProgress'),
+      examProgress: document.getElementById('examProgress'),
+      videoProgressBar: document.getElementById('videoProgressBar'),
+      examProgressBar: document.getElementById('examProgressBar')
+    };
+    
+    if (elements.completedVideos) elements.completedVideos.textContent = '0';
+    if (elements.completedExams) elements.completedExams.textContent = '0';
+    if (elements.totalVideosCount) elements.totalVideosCount.textContent = '0';
+    if (elements.totalExamsCount) elements.totalExamsCount.textContent = '0';
+    if (elements.watchedVideos) elements.watchedVideos.textContent = '0';
+    if (elements.passedExams) elements.passedExams.textContent = '0';
+    if (elements.totalTodos) elements.totalTodos.textContent = '0';
+    if (elements.videoProgress) elements.videoProgress.textContent = '0%';
+    if (elements.examProgress) elements.examProgress.textContent = '0%';
+    if (elements.videoProgressBar) elements.videoProgressBar.style.width = '0%';
+    if (elements.examProgressBar) elements.examProgressBar.style.width = '0%';
+  }
 }
 
 function loadTodos() {
@@ -358,39 +411,100 @@ async function loadExamResults() {
   }
 }
 
-function loadAchievements() {
+async function loadAchievements() {
   const container = document.getElementById('achievementsList');
   if (!container) return;
   
-  const achievements = [
-    { title: 'أول خطوة', description: 'شاهد أول فيديو تعليمي', icon: '🎬', unlocked: true, progress: 100 },
-    { title: 'خبير المشاهدة', description: 'شاهد 10 فيديوهات تعليمية', icon: '🏆', unlocked: false, progress: 50 },
-    { title: 'أول امتحان', description: 'اجتز أول امتحان بنجاح', icon: '📝', unlocked: true, progress: 100 }
-  ];
-  
-  container.innerHTML = '';
-  
-  achievements.forEach(achievement => {
-    const card = document.createElement('div');
-    card.className = `achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}`;
+  try {
+    const userId = currentUser.uid;
     
-    card.innerHTML = `
-      <div class="achievement-icon ${achievement.unlocked ? 'unlocked' : 'locked'}">
-        ${achievement.unlocked ? achievement.icon : '🔒'}
-      </div>
-      <h3 class="achievement-title">${achievement.title}</h3>
-      <p class="achievement-description">${achievement.description}</p>
-      <div class="achievement-progress">
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: ${achievement.progress}%"></div>
+    // Get real statistics
+    const videoWatchesSnapshot = await window.firebase.firestore.collection(db, 'videoWatches')
+      .where('userId', '==', userId).get();
+    const watchedVideosCount = videoWatchesSnapshot.size;
+    
+    const examResultsSnapshot = await window.firebase.firestore.collection(db, 'examResults')
+      .where('userId', '==', userId)
+      .where('passed', '==', true).get();
+    const passedExamsCount = examResultsSnapshot.size;
+    
+    // Define achievements based on real progress
+    const achievements = [
+      { 
+        title: 'أول خطوة', 
+        description: 'شاهد أول فيديو تعليمي', 
+        icon: '🎬', 
+        unlocked: watchedVideosCount >= 1, 
+        progress: Math.min(100, watchedVideosCount * 100) 
+      },
+      { 
+        title: 'خبير المشاهدة', 
+        description: 'شاهد 10 فيديوهات تعليمية', 
+        icon: '🏆', 
+        unlocked: watchedVideosCount >= 10, 
+        progress: Math.min(100, (watchedVideosCount / 10) * 100) 
+      },
+      { 
+        title: 'أول امتحان', 
+        description: 'اجتز أول امتحان بنجاح', 
+        icon: '📝', 
+        unlocked: passedExamsCount >= 1, 
+        progress: Math.min(100, passedExamsCount * 100) 
+      },
+      { 
+        title: 'متفوق', 
+        description: 'اجتز 5 امتحانات بنجاح', 
+        icon: '🌟', 
+        unlocked: passedExamsCount >= 5, 
+        progress: Math.min(100, (passedExamsCount / 5) * 100) 
+      },
+      { 
+        title: 'عاشق التعلم', 
+        description: 'شاهد 25 فيديو تعليمي', 
+        icon: '💎', 
+        unlocked: watchedVideosCount >= 25, 
+        progress: Math.min(100, (watchedVideosCount / 25) * 100) 
+      },
+      { 
+        title: 'بطل الامتحانات', 
+        description: 'اجتز 10 امتحانات بنجاح', 
+        icon: '👑', 
+        unlocked: passedExamsCount >= 10, 
+        progress: Math.min(100, (passedExamsCount / 10) * 100) 
+      }
+    ];
+    
+    container.innerHTML = '';
+    
+    achievements.forEach(achievement => {
+      const card = document.createElement('div');
+      card.className = `achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}`;
+      
+      card.innerHTML = `
+        <div class="achievement-icon ${achievement.unlocked ? 'unlocked' : 'locked'}">
+          ${achievement.unlocked ? achievement.icon : '🔒'}
         </div>
-        <span class="progress-text">${achievement.progress}%</span>
+        <h3 class="achievement-title">${achievement.title}</h3>
+        <p class="achievement-description">${achievement.description}</p>
+        <div class="achievement-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${Math.round(achievement.progress)}%"></div>
+          </div>
+          <span class="progress-text">${Math.round(achievement.progress)}%</span>
+        </div>
+        ${achievement.unlocked ? '<div class="achievement-badge">مكتمل</div>' : ''}
+      `;
+      
+      container.appendChild(card);
+    });
+  } catch (error) {
+    console.error('Error loading achievements:', error);
+    container.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #f87171;">
+        <p>حدث خطأ في تحميل الإنجازات</p>
       </div>
-      ${achievement.unlocked ? '<div class="achievement-badge">مكتمل</div>' : ''}
     `;
-    
-    container.appendChild(card);
-  });
+  }
 }
 
 // Add Todo Modal

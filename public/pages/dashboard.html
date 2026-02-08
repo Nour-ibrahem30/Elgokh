@@ -11,6 +11,7 @@
     
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/css/pages_style/dashboard.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
     <style>
         #three-canvas {
             position: fixed;
@@ -478,6 +479,10 @@
                     <span class="sidebar-icon" aria-hidden="true">📚</span>
                     <span>إدارة المذكرات</span>
                 </button>
+                <button class="sidebar-link" data-section="motivational">
+                    <span class="sidebar-icon" aria-hidden="true">💬</span>
+                    <span>الرسائل التحفيزية</span>
+                </button>
                 <button class="sidebar-link" data-section="students">
                     <span class="sidebar-icon" aria-hidden="true">👥</span>
                     <span>الطلاب</span>
@@ -589,6 +594,21 @@
                 <div id="materialsGrade1" class="materials-content active"></div>
                 <div id="materialsGrade2" class="materials-content" style="display: none;"></div>
                 <div id="materialsGrade3" class="materials-content" style="display: none;"></div>
+            </section>
+
+            <!-- Motivational Messages Section -->
+            <section id="motivational-section" class="dashboard-section">
+                <div class="section-header">
+                    <h1 class="dashboard-title">💬 الرسائل التحفيزية</h1>
+                    <button class="btn btn-primary" id="addMotivationalBtn">
+                        <span aria-hidden="true">➕</span> إضافة رسالة
+                    </button>
+                </div>
+                <div class="info-box" style="margin-bottom: 2rem;">
+                    <p>📌 الرسائل التحفيزية تظهر للطلاب تلقائياً عند دخولهم المنصة وكل ساعة</p>
+                    <p>💡 أضف رسائل إيجابية ومحفزة لتشجيع الطلاب على التعلم</p>
+                </div>
+                <div id="motivationalList" class="content-grid"></div>
             </section>
 
             <section id="students-section" class="dashboard-section">
@@ -1111,6 +1131,11 @@
                         if (sectionId === 'students') {
                             loadStudents();
                         }
+                        
+                        // Load motivational messages when section is opened
+                        if (sectionId === 'motivational') {
+                            loadMotivationalMessages();
+                        }
                     } else {
                         console.error('❌ Section not found:', `${sectionId}-section`);
                     }
@@ -1166,69 +1191,281 @@
                 }
             });
 
-            // Load Students Function
-            function loadStudents() {
+            // Load Students Function - Enhanced with tracking
+            async function loadStudents() {
                 console.log('Loading students...');
                 const studentsList = document.getElementById('studentsList');
                 if (!studentsList) return;
                 
-                // Get registered users from localStorage
-                const registeredUsers = [];
-                
-                // Check for stored users in different formats
                 try {
-                    const currentUser = localStorage.getItem('currentUser');
-                    const currentUserEmail = localStorage.getItem('currentUserEmail');
-                    const userRole = localStorage.getItem('userRole');
+                    // Load all users from Firestore
+                    const usersSnapshot = await window.firebase.firestore.getDocs(
+                        window.firebase.firestore.collection(db, 'users')
+                    );
+                    const students = [];
                     
-                    if (currentUser && currentUserEmail && userRole === 'student') {
-                        const userData = JSON.parse(currentUser);
-                        registeredUsers.push({
-                            name: userData.name || extractNameFromEmail(currentUserEmail),
-                            email: currentUserEmail,
-                            role: 'student',
-                            joinDate: new Date().toLocaleDateString('ar-EG')
-                        });
+                    for (const userDoc of usersSnapshot.docs) {
+                        const userData = userDoc.data();
+                        
+                        // Only include students (not teachers)
+                        if (userData.role !== 'teacher' && userData.role !== 'admin') {
+                            // Get student's exam results
+                            const examResultsQuery = window.firebase.firestore.query(
+                                window.firebase.firestore.collection(db, 'examResults'),
+                                window.firebase.firestore.where('userId', '==', userDoc.id)
+                            );
+                            const examResultsSnapshot = await window.firebase.firestore.getDocs(examResultsQuery);
+                            
+                            // Get student's video watches
+                            const videoWatchesQuery = window.firebase.firestore.query(
+                                window.firebase.firestore.collection(db, 'videoWatches'),
+                                window.firebase.firestore.where('userId', '==', userDoc.id)
+                            );
+                            const videoWatchesSnapshot = await window.firebase.firestore.getDocs(videoWatchesQuery);
+                            
+                            // Calculate statistics
+                            const totalExams = examResultsSnapshot.size;
+                            const passedExams = examResultsSnapshot.docs.filter(doc => doc.data().passed).length;
+                            const totalVideos = videoWatchesSnapshot.size;
+                            
+                            // Calculate average score
+                            let averageScore = 0;
+                            if (totalExams > 0) {
+                                const totalScore = examResultsSnapshot.docs.reduce((sum, doc) => sum + (doc.data().score || 0), 0);
+                                averageScore = Math.round(totalScore / totalExams);
+                            }
+                            
+                            // Get last activity
+                            let lastActivity = userData.createdAt || userData.lastLogin || new Date().toISOString();
+                            
+                            students.push({
+                                id: userDoc.id,
+                                name: userData.name || userData.displayName || 'طالب',
+                                email: userData.email || '',
+                                joinDate: userData.createdAt ? new Date(userData.createdAt).toLocaleDateString('ar-EG') : 'غير محدد',
+                                lastActivity: new Date(lastActivity).toLocaleDateString('ar-EG'),
+                                totalExams: totalExams,
+                                passedExams: passedExams,
+                                totalVideos: totalVideos,
+                                averageScore: averageScore,
+                                status: userData.active !== false ? 'نشط' : 'معلق'
+                            });
+                        }
                     }
                     
-                    // Add sample students for demo
-                    const sampleStudents = [
-                        { name: 'أحمد محمد', email: 'ahmed@student.com', role: 'student', joinDate: '2024-01-15' },
-                        { name: 'فاطمة علي', email: 'fatima@student.com', role: 'student', joinDate: '2024-01-20' },
-                        { name: 'محمود حسن', email: 'mahmoud@student.com', role: 'student', joinDate: '2024-01-25' },
-                        { name: 'نور الدين', email: 'nour@student.com', role: 'student', joinDate: '2024-02-01' }
-                    ];
+                    if (students.length === 0) {
+                        studentsList.innerHTML = `
+                            <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #94a3b8;">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
+                                <p>لا يوجد طلاب مسجلين حالياً</p>
+                                <p style="font-size: 0.9rem; margin-top: 0.5rem;">سيظهر الطلاب هنا عند تسجيلهم في المنصة</p>
+                            </div>
+                        `;
+                        return;
+                    }
                     
-                    registeredUsers.push(...sampleStudents);
+                    // Sort by last activity (most recent first)
+                    students.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
+                    
+                    studentsList.innerHTML = students.map(student => `
+                        <div class="content-card" style="cursor: pointer;" onclick="viewStudentDetails('${student.id}')">
+                            <div class="card-header">
+                                <div>
+                                    <h3 style="color: #3b82f6; margin-bottom: 0.5rem;">👤 ${student.name}</h3>
+                                    <p style="color: #94a3b8; font-size: 0.9rem;">📧 ${student.email}</p>
+                                </div>
+                                <span class="badge ${student.status === 'نشط' ? 'badge-success' : 'badge-warning'}">${student.status}</span>
+                            </div>
+                            <div class="card-body">
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0;">
+                                    <div style="background: rgba(59, 130, 246, 0.1); padding: 0.75rem; border-radius: 8px;">
+                                        <div style="font-size: 1.5rem; font-weight: bold; color: #3b82f6;">${student.totalVideos}</div>
+                                        <div style="font-size: 0.875rem; color: #94a3b8;">فيديو مشاهد</div>
+                                    </div>
+                                    <div style="background: rgba(16, 185, 129, 0.1); padding: 0.75rem; border-radius: 8px;">
+                                        <div style="font-size: 1.5rem; font-weight: bold; color: #10b981;">${student.passedExams}/${student.totalExams}</div>
+                                        <div style="font-size: 0.875rem; color: #94a3b8;">امتحان ناجح</div>
+                                    </div>
+                                </div>
+                                <div style="background: rgba(139, 92, 246, 0.1); padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem;">
+                                    <div style="font-size: 1.5rem; font-weight: bold; color: #a78bfa;">${student.averageScore}%</div>
+                                    <div style="font-size: 0.875rem; color: #94a3b8;">متوسط الدرجات</div>
+                                </div>
+                                <div class="card-meta">
+                                    <span>📅 انضم: ${student.joinDate}</span>
+                                    <span>🕐 آخر نشاط: ${student.lastActivity}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    // Update students count if element exists
+                    const totalStudentsEl = document.getElementById('totalStudents');
+                    if (totalStudentsEl) {
+                        totalStudentsEl.textContent = students.length;
+                    }
+                    
+                    console.log('✅ Loaded students:', students.length);
                     
                 } catch (error) {
                     console.error('Error loading students:', error);
+                    studentsList.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #f87171;">
+                            <p>حدث خطأ في تحميل الطلاب</p>
+                            <p style="font-size: 0.875rem; margin-top: 0.5rem;">${error.message}</p>
+                        </div>
+                    `;
                 }
-                
-                if (registeredUsers.length === 0) {
-                    studentsList.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 2rem;">لا يوجد طلاب مسجلين حالياً</p>';
-                    return;
-                }
-                
-                studentsList.innerHTML = `
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
-                        ${registeredUsers.map(student => `
-                            <div class="content-item">
-                                <div class="content-item-header">
-                                    <h3 class="content-item-title">👤 ${student.name}</h3>
-                                </div>
-                                <p style="color: #94a3b8; margin-top: 0.5rem;">📧 ${student.email}</p>
-                                <p style="color: #64748b; font-size: 0.875rem; margin-top: 0.5rem;">📅 تاريخ التسجيل: ${student.joinDate}</p>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-                
-                // Update students count
-                document.getElementById('totalStudents').textContent = registeredUsers.length;
-                
-                console.log('Students loaded:', registeredUsers.length);
             }
+            
+            // View student details
+            window.viewStudentDetails = async function(studentId) {
+                try {
+                    // Get student data
+                    const studentDoc = await window.firebase.firestore.getDoc(
+                        window.firebase.firestore.doc(db, 'users', studentId)
+                    );
+                    
+                    if (!studentDoc.exists()) {
+                        showToast('الطالب غير موجود', 'error');
+                        return;
+                    }
+                    
+                    const student = studentDoc.data();
+                    
+                    // Get exam results
+                    const examResultsQuery = window.firebase.firestore.query(
+                        window.firebase.firestore.collection(db, 'examResults'),
+                        window.firebase.firestore.where('userId', '==', studentId),
+                        window.firebase.firestore.orderBy('completedAt', 'desc')
+                    );
+                    const examResultsSnapshot = await window.firebase.firestore.getDocs(examResultsQuery);
+                    
+                    // Get video watches
+                    const videoWatchesQuery = window.firebase.firestore.query(
+                        window.firebase.firestore.collection(db, 'videoWatches'),
+                        window.firebase.firestore.where('userId', '==', studentId),
+                        window.firebase.firestore.orderBy('watchedAt', 'desc')
+                    );
+                    const videoWatchesSnapshot = await window.firebase.firestore.getDocs(videoWatchesQuery);
+                    
+                    // Create modal
+                    const modal = document.createElement('div');
+                    modal.className = 'modal active';
+                    modal.innerHTML = `
+                        <div class="modal-overlay"></div>
+                        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+                            <div class="modal-header">
+                                <h2>📊 تفاصيل الطالب</h2>
+                                <button class="modal-close">×</button>
+                            </div>
+                            
+                            <div style="margin-bottom: 2rem;">
+                                <h3 style="color: #3b82f6; font-size: 1.5rem; margin-bottom: 0.5rem;">👤 ${student.name || 'طالب'}</h3>
+                                <p style="color: #94a3b8;">📧 ${student.email || ''}</p>
+                                <p style="color: #94a3b8; font-size: 0.875rem; margin-top: 0.5rem;">
+                                    📅 انضم: ${student.createdAt ? new Date(student.createdAt).toLocaleDateString('ar-EG') : 'غير محدد'}
+                                </p>
+                            </div>
+                            
+                            <!-- Statistics -->
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                                <div style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 12px; text-align: center;">
+                                    <div style="font-size: 2rem; font-weight: bold; color: #3b82f6;">${videoWatchesSnapshot.size}</div>
+                                    <div style="color: #94a3b8; font-size: 0.875rem;">فيديو مشاهد</div>
+                                </div>
+                                <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 12px; text-align: center;">
+                                    <div style="font-size: 2rem; font-weight: bold; color: #10b981;">${examResultsSnapshot.size}</div>
+                                    <div style="color: #94a3b8; font-size: 0.875rem;">امتحان محلول</div>
+                                </div>
+                                <div style="background: rgba(139, 92, 246, 0.1); padding: 1rem; border-radius: 12px; text-align: center;">
+                                    <div style="font-size: 2rem; font-weight: bold; color: #a78bfa;">
+                                        ${examResultsSnapshot.size > 0 ? Math.round(examResultsSnapshot.docs.reduce((sum, doc) => sum + (doc.data().score || 0), 0) / examResultsSnapshot.size) : 0}%
+                                    </div>
+                                    <div style="color: #94a3b8; font-size: 0.875rem;">متوسط الدرجات</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Exam Results -->
+                            <div style="margin-bottom: 2rem;">
+                                <h3 style="color: #3b82f6; margin-bottom: 1rem;">📝 نتائج الامتحانات</h3>
+                                ${examResultsSnapshot.empty ? 
+                                    '<p style="color: #94a3b8; text-align: center; padding: 1rem;">لم يحل أي امتحان بعد</p>' :
+                                    examResultsSnapshot.docs.map(doc => {
+                                        const result = doc.data();
+                                        return `
+                                            <div style="background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; border-right: 4px solid ${result.passed ? '#10b981' : '#ef4444'};">
+                                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                                                    <div style="flex: 1; min-width: 200px;">
+                                                        <h4 style="color: #f1f5f9; margin-bottom: 0.25rem;">${result.examTitle}</h4>
+                                                        <p style="color: #94a3b8; font-size: 0.875rem;">
+                                                            📅 ${new Date(result.completedAt).toLocaleDateString('ar-EG')} - 
+                                                            ${result.correctAnswers}/${result.totalQuestions} صحيح
+                                                        </p>
+                                                    </div>
+                                                    <div style="text-align: left;">
+                                                        <div style="font-size: 1.5rem; font-weight: bold; color: ${result.passed ? '#10b981' : '#ef4444'};">
+                                                            ${result.score}%
+                                                        </div>
+                                                        <span class="badge ${result.passed ? 'badge-success' : 'badge-danger'}">
+                                                            ${result.passed ? '✅ ناجح' : '❌ راسب'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')
+                                }
+                            </div>
+                            
+                            <!-- Video Watches -->
+                            <div>
+                                <h3 style="color: #3b82f6; margin-bottom: 1rem;">🎥 الفيديوهات المشاهدة</h3>
+                                ${videoWatchesSnapshot.empty ? 
+                                    '<p style="color: #94a3b8; text-align: center; padding: 1rem;">لم يشاهد أي فيديو بعد</p>' :
+                                    videoWatchesSnapshot.docs.slice(0, 10).map(doc => {
+                                        const watch = doc.data();
+                                        return `
+                                            <div style="background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; border-right: 4px solid #3b82f6;">
+                                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                                                    <div style="flex: 1; min-width: 200px;">
+                                                        <h4 style="color: #f1f5f9; margin-bottom: 0.25rem;">${watch.videoTitle}</h4>
+                                                        <p style="color: #94a3b8; font-size: 0.875rem;">
+                                                            📅 ${watch.watchedAt ? new Date(watch.watchedAt.toDate()).toLocaleDateString('ar-EG') : 'غير محدد'}
+                                                        </p>
+                                                    </div>
+                                                    <span class="badge badge-success">✅ مكتمل</span>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')
+                                }
+                                ${videoWatchesSnapshot.size > 10 ? `<p style="color: #94a3b8; text-align: center; margin-top: 1rem; font-size: 0.875rem;">وأكثر من ${videoWatchesSnapshot.size - 10} فيديو آخر...</p>` : ''}
+                            </div>
+                            
+                            <div class="form-actions" style="margin-top: 2rem;">
+                                <button type="button" class="btn btn-secondary close-modal">إغلاق</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(modal);
+                    
+                    const closeBtn = modal.querySelector('.modal-close');
+                    const cancelBtn = modal.querySelector('.close-modal');
+                    const overlay = modal.querySelector('.modal-overlay');
+                    
+                    const closeModal = () => modal.remove();
+                    
+                    closeBtn.addEventListener('click', closeModal);
+                    cancelBtn.addEventListener('click', closeModal);
+                    overlay.addEventListener('click', closeModal);
+                    
+                } catch (error) {
+                    console.error('Error viewing student details:', error);
+                    showToast('خطأ في عرض تفاصيل الطالب: ' + error.message, 'error');
+                }
+            };
             
             function extractNameFromEmail(email) {
                 const namePart = email.split('@')[0];
@@ -2272,8 +2509,178 @@
                 if (!materialBtn) console.error('Material button missing!');
             }, 1000);
             
+            // ========================================
+            // MOTIVATIONAL MESSAGES MANAGEMENT
+            // ========================================
+            
+            let motivationalMessages = [];
+            
+            // Load motivational messages
+            async function loadMotivationalMessages() {
+                try {
+                    const snapshot = await window.firebase.firestore.collection(db, 'motivationalMessages').get();
+                    motivationalMessages = [];
+                    
+                    snapshot.forEach(doc => {
+                        motivationalMessages.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                    
+                    // Save to localStorage for student pages
+                    localStorage.setItem('motivationalMessages', JSON.stringify(motivationalMessages));
+                    
+                    renderMotivationalMessages();
+                    console.log('✅ Loaded motivational messages:', motivationalMessages.length);
+                } catch (error) {
+                    console.error('Error loading motivational messages:', error);
+                    showToast('خطأ في تحميل الرسائل التحفيزية', 'error');
+                }
+            }
+            
+            // Render motivational messages
+            function renderMotivationalMessages() {
+                const container = document.getElementById('motivationalList');
+                if (!container) return;
+                
+                if (motivationalMessages.length === 0) {
+                    container.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #94a3b8;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">💬</div>
+                            <p>لا توجد رسائل تحفيزية حالياً</p>
+                            <p style="font-size: 0.9rem; margin-top: 0.5rem;">اضغط "إضافة رسالة" لإنشاء رسالة جديدة</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = motivationalMessages.map(msg => `
+                    <div class="content-card" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1)); border-color: rgba(139, 92, 246, 0.3);">
+                        <div class="card-header">
+                            <h3 style="color: #a78bfa;">💬 رسالة تحفيزية</h3>
+                            <button class="btn-icon delete-btn" onclick="deleteMotivationalMessage('${msg.id}')" title="حذف">
+                                🗑️
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <p style="color: #e9d5ff; font-size: 1.1rem; line-height: 1.8; margin: 1rem 0;">${msg.message}</p>
+                            <div class="card-meta">
+                                <span>📅 ${new Date(msg.createdAt).toLocaleDateString('ar-EG')}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Add motivational message button
+            const addMotivationalBtn = document.getElementById('addMotivationalBtn');
+            if (addMotivationalBtn) {
+                addMotivationalBtn.addEventListener('click', () => {
+                    const modal = document.createElement('div');
+                    modal.className = 'modal active';
+                    modal.innerHTML = `
+                        <div class="modal-overlay"></div>
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2>💬 إضافة رسالة تحفيزية</h2>
+                                <button class="modal-close">×</button>
+                            </div>
+                            <form id="addMotivationalForm">
+                                <div class="form-group">
+                                    <label>الرسالة التحفيزية *</label>
+                                    <textarea id="motivationalMessage" required rows="4" placeholder="اكتب رسالة إيجابية ومحفزة للطلاب..."></textarea>
+                                </div>
+                                <div class="info-box" style="margin-bottom: 1rem;">
+                                    <p>💡 نصائح لكتابة رسالة تحفيزية فعالة:</p>
+                                    <ul style="margin: 0.5rem 0 0 1.5rem;">
+                                        <li>استخدم لغة إيجابية ومشجعة</li>
+                                        <li>اجعلها قصيرة ومباشرة</li>
+                                        <li>ركز على التحفيز والإلهام</li>
+                                    </ul>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">✅ إضافة الرسالة</button>
+                                    <button type="button" class="btn btn-secondary close-modal">❌ إلغاء</button>
+                                </div>
+                            </form>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(modal);
+                    
+                    const form = modal.querySelector('#addMotivationalForm');
+                    const closeBtn = modal.querySelector('.modal-close');
+                    const cancelBtn = modal.querySelector('.close-modal');
+                    const overlay = modal.querySelector('.modal-overlay');
+                    
+                    const closeModal = () => modal.remove();
+                    
+                    form.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        
+                        const message = document.getElementById('motivationalMessage').value.trim();
+                        
+                        if (!message) {
+                            showToast('يرجى إدخال الرسالة', 'error');
+                            return;
+                        }
+                        
+                        try {
+                            const newMessage = {
+                                message: message,
+                                createdAt: new Date().toISOString(),
+                                active: true
+                            };
+                            
+                            await window.firebase.firestore.addDoc(
+                                window.firebase.firestore.collection(db, 'motivationalMessages'),
+                                newMessage
+                            );
+                            
+                            showToast('تم إضافة الرسالة التحفيزية بنجاح!', 'success');
+                            closeModal();
+                            await loadMotivationalMessages();
+                        } catch (error) {
+                            console.error('Error adding motivational message:', error);
+                            showToast('خطأ في إضافة الرسالة: ' + error.message, 'error');
+                        }
+                    });
+                    
+                    closeBtn.addEventListener('click', closeModal);
+                    cancelBtn.addEventListener('click', closeModal);
+                    overlay.addEventListener('click', closeModal);
+                    
+                    setTimeout(() => {
+                        document.getElementById('motivationalMessage').focus();
+                    }, 100);
+                });
+            }
+            
+            // Delete motivational message
+            window.deleteMotivationalMessage = async function(messageId) {
+                if (!confirm('هل أنت متأكد من حذف هذه الرسالة التحفيزية؟')) {
+                    return;
+                }
+                
+                try {
+                    await window.firebase.firestore.deleteDoc(
+                        window.firebase.firestore.doc(db, 'motivationalMessages', messageId)
+                    );
+                    
+                    showToast('تم حذف الرسالة التحفيزية بنجاح', 'success');
+                    await loadMotivationalMessages();
+                } catch (error) {
+                    console.error('Error deleting motivational message:', error);
+                    showToast('خطأ في حذف الرسالة: ' + error.message, 'error');
+                }
+            };
+            
             console.log('Dashboard initialization complete!');
         });
     </script>
+    
+    <!-- Mobile Menu Script -->
+    <script src="../assets/js/mobile-menu.js"></script>
 </body>
 </html>
