@@ -1,0 +1,28 @@
+{
+  "name": "منصة الفلسفة والمنطق التعليمية",
+  "short_name": "الفلسفة والمنطق",
+  "description": "منصة تعليمية متطورة للفلسفة والمنطق - المرحلة الثانوية",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "/public/assets/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/public/assets/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "learning"],
+  "screenshots": []
+}

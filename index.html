@@ -2,23 +2,87 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="theme-color" content="#0f172a">
     
-    <title>منصة محمد ناصر التعليمية | الفلسفة والمنطق - المرحلة الثانوية</title>
-    <meta name="description" content="منصة تعليمية متكاملة للفلسفة والمنطق - المرحلة الثانوية | دروس فيديو، امتحانات تفاعلية، ومذكرات شاملة مع الأستاذ محمد ناصر">
-    <meta name="keywords" content="فلسفة, منطق, ثانوية عامة, محمد ناصر, دروس فلسفة, امتحانات فلسفة, مذكرات فلسفة">
-    <meta name="author" content="الأستاذ محمد ناصر">
-    <meta name="robots" content="index, follow">
+    <!-- SEO Meta Tags -->
+    <title>منصة الفلسفة والمنطق التعليمية | دروس وامتحانات تفاعلية للثانوية العامة</title>
+    <meta name="description" content="منصة تعليمية متطورة للفلسفة والمنطق - المرحلة الثانوية. دروس فيديو شاملة، امتحانات تفاعلية، مذكرات PDF، وملاحظات ذكية. انضم الآن وحقق التفوق!">
+    <meta name="keywords" content="فلسفة, منطق, ثانوية عامة, دروس فلسفة, امتحانات فلسفة, مذكرات فلسفة, تعليم أونلاين, منصة تعليمية">
+    <meta name="author" content="منصة الفلسفة والمنطق">
+    <meta name="robots" content="index, follow, max-image-preview:large">
     
+    <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="منصة محمد ناصر التعليمية - الفلسفة والمنطق">
-    <meta property="og:description" content="منصة تعليمية متكاملة للفلسفة والمنطق مع دروس فيديو وامتحانات تفاعلية">
+    <meta property="og:site_name" content="منصة الفلسفة والمنطق">
+    <meta property="og:title" content="منصة الفلسفة والمنطق التعليمية - دروس تفاعلية للثانوية">
+    <meta property="og:description" content="منصة تعليمية متكاملة للفلسفة والمنطق مع دروس فيديو وامتحانات تفاعلية ومذكرات شاملة">
+    <meta property="og:locale" content="ar_EG">
     
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="منصة الفلسفة والمنطق التعليمية">
+    <meta name="twitter:description" content="منصة تعليمية متطورة للفلسفة والمنطق - دروس وامتحانات تفاعلية">
+    
+    <!-- Canonical URL -->
     <link rel="canonical" href="https://philosopher-platform.com/">
-    <link rel="stylesheet" href="public/assets/css/main.css">
-    <link rel="stylesheet" href="public/assets/css/pages_style/home.css">
-    <link rel="stylesheet" href="public/assets/css/responsive.css">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/public/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="الفلسفة والمنطق">
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://www.gstatic.com">
+    <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com">
+    
+    <!-- Critical CSS - Inline for faster load -->
+    <style>
+        /* Critical Above-the-Fold Styles */
+        *{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth}
+        body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#f1f5f9;direction:rtl;min-height:100vh;line-height:1.6}
+        .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}
+        
+        /* Navbar Critical Styles */
+        .navbar{background:rgba(30,41,59,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(59,130,246,.2);position:sticky;top:0;z-index:1000;transition:all .3s ease}
+        .nav-container{max-width:1400px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:70px}
+        
+        /* Hero Critical Styles */
+        .hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:4rem 2rem;overflow:hidden}
+        .hero-content{position:relative;z-index:1;text-align:center;max-width:800px}
+        .hero-title{font-size:clamp(2rem,5vw,2.5rem);font-weight:bold;margin-bottom:1.5rem;background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+        
+        /* Button Critical Styles */
+        .btn{padding:1rem 2rem;border:none;border-radius:8px;cursor:pointer;font-weight:500;transition:all .3s ease;text-decoration:none;display:inline-block}
+        .btn-primary{background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff}
+        .btn-secondary{background:rgba(59,130,246,.1);color:#3b82f6;border:2px solid rgba(59,130,246,.3)}
+        
+        /* Loading State */
+        .loading{display:flex;align-items:center;justify-content:center;min-height:100vh;font-size:1.5rem}
+    </style>
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="public/assets/css/main.css" as="style">
+    <link rel="preload" href="public/assets/js/components-loader.js" as="script">
+    
+    <!-- Async Load Non-Critical CSS -->
+    <link rel="stylesheet" href="public/assets/css/main.css" media="all">
+    <link rel="stylesheet" href="public/assets/css/pages_style/home.css" media="print" onload="this.media='all';this.onload=null;">
+    <link rel="stylesheet" href="public/assets/css/responsive.css" media="print" onload="this.media='all';this.onload=null;">
+    
+    <!-- Fallback for browsers without JS -->
+    <noscript>
+        <link rel="stylesheet" href="public/assets/css/pages_style/home.css">
+        <link rel="stylesheet" href="public/assets/css/responsive.css">
+    </noscript>
+    
+    <!-- Inline Small CSS for Performance -->
     <style>
         #three-canvas {
             position: fixed;
@@ -167,35 +231,21 @@
         ↑
     </button>
 
-    <script src="public/assets/js/components-loader.js"></script>
+    <script src="public/assets/js/components-loader.js" defer></script>
     <script>
-        (function() {
-            var backToTopBtn = document.getElementById('backToTop');
-            if (backToTopBtn) {
-                window.addEventListener('scroll', function() {
-                    backToTopBtn.style.display = window.pageYOffset > 300 ? 'block' : 'none';
-                });
-                backToTopBtn.addEventListener('click', function() {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-                backToTopBtn.addEventListener('mouseenter', function() {
-                    backToTopBtn.style.transform = 'scale(1.1)';
-                    backToTopBtn.style.boxShadow = '0 6px 30px rgba(59, 130, 246, 0.6)';
-                });
-                backToTopBtn.addEventListener('mouseleave', function() {
-                    backToTopBtn.style.transform = 'scale(1)';
-                    backToTopBtn.style.boxShadow = '0 4px 20px rgba(59, 130, 246, 0.4)';
-                });
-            }
-        })();
+        // Optimized Back to Top
+        window.addEventListener('DOMContentLoaded',function(){var b=document.getElementById('backToTop');if(!b)return;var t=false;function u(){b.style.display=window.pageYOffset>300?'block':'none';t=false}window.addEventListener('scroll',function(){if(!t){requestAnimationFrame(u);t=true}},{passive:true});b.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})})});
     </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Load animations after page load -->
     <script>
-        // Three.js Scene - Philosophy Brain Model
+        window.addEventListener('load',function(){if('connection' in navigator&&navigator.connection.saveData)return;var s=['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js','https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js','https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js'];function l(src,cb){var sc=document.createElement('script');sc.src=src;sc.async=true;sc.onload=cb;document.body.appendChild(sc)}l(s[0],function(){l(s[1],function(){l(s[2],function(){if(typeof initAnimations==='function')initAnimations()})})})});
+    </script>
+    <script>
+        // Three.js Scene - Lazy Init
+        function initAnimations() {
         const canvas = document.getElementById('three-canvas');
+        if (!canvas || !window.THREE) return;
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
@@ -281,11 +331,48 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
+        }
     </script>
     <script type="module" src="public/assets/js/main.js" defer></script>
-    <script src="public/assets/js/motivational-toast.js"></script>
+    <script src="public/assets/js/motivational-toast.js" defer></script>
 
     <!-- Mobile Menu Script -->
-    <script src="public/assets/js/mobile-menu.js"></script>
+    <script src="public/assets/js/mobile-menu.js" defer></script>
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "منصة الفلسفة والمنطق التعليمية",
+      "description": "منصة تعليمية متطورة للفلسفة والمنطق - المرحلة الثانوية",
+      "url": "https://philosopher-platform.com",
+      "logo": "https://philosopher-platform.com/public/assets/images/logo.png",
+      "sameAs": [],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "Customer Service",
+        "availableLanguage": ["Arabic"]
+      },
+      "offers": {
+        "@type": "Offer",
+        "category": "Education"
+      }
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "منصة الفلسفة والمنطق",
+      "url": "https://philosopher-platform.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://philosopher-platform.com/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
 </body>
 </html>

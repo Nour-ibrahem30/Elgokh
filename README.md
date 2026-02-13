@@ -564,7 +564,7 @@ async function rateVideo(videoId, rating) {
 [![Firebase](https://img.shields.io/badge/Powered%20by-Firebase-orange?style=for-the-badge&logo=firebase)](https://firebase.google.com)
 [![Node.js](https://img.shields.io/badge/Built%20with-Node.js-green?style=for-the-badge&logo=node.js)](https://nodejs.org)
 
-**آخر تحديث:** فبراير 2024 | **الإصدار:** 2.0.0
+**آخر تحديث:** فبراير 2026 | **الإصدار:** 2.0.0
 
 ---
 

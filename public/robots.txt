@@ -1,0 +1,18 @@
+# robots.txt for Philosophy Platform
+
+User-agent: *
+Allow: /
+Allow: /public/pages/
+Allow: /public/assets/
+
+Disallow: /firebase-backend/
+Disallow: /node_modules/
+Disallow: /.git/
+Disallow: /tests/
+Disallow: /uploads/
+
+# Sitemap
+Sitemap: https://philosopher-platform.com/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 1
