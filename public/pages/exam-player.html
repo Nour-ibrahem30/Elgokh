@@ -301,6 +301,152 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Result Popup Modal */
+        .result-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .result-popup.show {
+            display: flex;
+        }
+
+        .result-popup-content {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            backdrop-filter: blur(20px);
+            border: 3px solid rgba(59, 130, 246, 0.5);
+            border-radius: 30px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: slideUp 0.5s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .result-popup-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .result-popup-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .result-popup-score {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 1.5rem 0;
+        }
+
+        .result-popup-score.excellent {
+            color: #10b981;
+            text-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+        }
+
+        .result-popup-score.good {
+            color: #3b82f6;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        }
+
+        .result-popup-score.fair {
+            color: #f59e0b;
+            text-shadow: 0 0 30px rgba(245, 158, 11, 0.5);
+        }
+
+        .result-popup-score.poor {
+            color: #ef4444;
+            text-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+        }
+
+        .result-popup-message {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .result-popup-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 2rem 0;
+            gap: 1rem;
+        }
+
+        .result-popup-stat {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .result-popup-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+
+        .result-popup-stat-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        .result-popup-btn {
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .result-popup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -357,6 +503,29 @@
                 <button class="btn btn-secondary" onclick="window.location.href='exams.html'">العودة للامتحانات</button>
                 <button class="btn btn-primary" onclick="location.reload()">إعادة المحاولة</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Result Popup Modal -->
+    <div class="result-popup" id="resultPopup">
+        <div class="result-popup-content">
+            <div class="result-popup-icon" id="popupIcon">🎉</div>
+            <h2 class="result-popup-title" id="popupTitle">نتيجة الامتحان</h2>
+            <div class="result-popup-score" id="popupScore">0%</div>
+            <p class="result-popup-message" id="popupMessage">رسالة تحفيزية</p>
+            
+            <div class="result-popup-stats">
+                <div class="result-popup-stat">
+                    <div class="result-popup-stat-value" id="popupCorrect">0</div>
+                    <div class="result-popup-stat-label">صحيحة ✅</div>
+                </div>
+                <div class="result-popup-stat">
+                    <div class="result-popup-stat-value" id="popupIncorrect">0</div>
+                    <div class="result-popup-stat-label">خاطئة ❌</div>
+                </div>
+            </div>
+            
+            <button class="result-popup-btn" onclick="closeResultPopup()">عرض التفاصيل 📊</button>
         </div>
     </div>
 
@@ -641,17 +810,56 @@
                 `;
             }).join('');
             
-            // 8. عرض رسالة تحفيزية
-            if (passed) {
-                setTimeout(() => {
-                    alert(`🎉 مبروك! لقد نجحت في الامتحان بنسبة ${percentage}%`);
-                }, 500);
+            // 8. عرض popup النتيجة
+            showResultPopup(percentage, correct, incorrect, passed);
+        }
+
+        function showResultPopup(percentage, correct, incorrect, passed) {
+            const popup = document.getElementById('resultPopup');
+            const icon = document.getElementById('popupIcon');
+            const title = document.getElementById('popupTitle');
+            const score = document.getElementById('popupScore');
+            const message = document.getElementById('popupMessage');
+            
+            // تحديد الأيقونة والرسالة حسب النتيجة
+            if (percentage >= 90) {
+                icon.textContent = '🏆';
+                title.textContent = 'ممتاز! أداء رائع';
+                message.textContent = 'أنت متفوق! استمر في هذا المستوى الرائع';
+                score.className = 'result-popup-score excellent';
+            } else if (percentage >= 70) {
+                icon.textContent = '🎉';
+                title.textContent = 'أحسنت! نتيجة جيدة';
+                message.textContent = 'أداء جيد جداً! مع المزيد من المذاكرة ستصل للقمة';
+                score.className = 'result-popup-score good';
+            } else if (percentage >= 50) {
+                icon.textContent = '👍';
+                title.textContent = 'جيد! يمكنك التحسين';
+                message.textContent = 'نتيجة مقبولة، راجع الأخطاء وحاول مرة أخرى';
+                score.className = 'result-popup-score fair';
             } else {
-                setTimeout(() => {
-                    alert(`💪 لا تستسلم! حاول مرة أخرى. نسبتك: ${percentage}%`);
-                }, 500);
+                icon.textContent = '💪';
+                title.textContent = 'لا تستسلم!';
+                message.textContent = 'المحاولة الأولى دائماً صعبة، راجع المادة وحاول مرة أخرى';
+                score.className = 'result-popup-score poor';
+            }
+            
+            score.textContent = `${percentage}%`;
+            document.getElementById('popupCorrect').textContent = correct;
+            document.getElementById('popupIncorrect').textContent = incorrect;
+            
+            // عرض الـ popup
+            popup.classList.add('show');
+            
+            // تشغيل صوت (اختياري)
+            if (passed) {
+                // يمكن إضافة صوت نجاح هنا
             }
         }
+
+        window.closeResultPopup = function() {
+            document.getElementById('resultPopup').classList.remove('show');
+        };
 
         // Load exam on page load
         loadExam();

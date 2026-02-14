@@ -355,8 +355,7 @@ async function loadExamResults() {
     // تحميل نتائج الامتحانات من Firebase
     const resultsQuery = window.firebase.firestore()
       .collection('examResults')
-      .where('userId', '==', user.uid)
-      .orderBy('completedAt', 'desc');
+      .where('userId', '==', user.uid);
     
     const resultsSnapshot = await resultsQuery.get();
     
@@ -372,15 +371,25 @@ async function loadExamResults() {
     
     container.innerHTML = '';
     
+    // ترتيب النتائج حسب التاريخ (الأحدث أولاً)
+    const results = [];
     resultsSnapshot.forEach(doc => {
-      const result = doc.data();
+      results.push({ id: doc.id, ...doc.data() });
+    });
+    results.sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
+    
+    results.forEach(result => {
       const percentage = Math.round(result.score);
       const passed = result.passed;
       
       const resultElement = document.createElement('div');
       resultElement.className = `result-item ${passed ? 'passed' : 'failed'}`;
       
-      const date = new Date(result.completedAt).toLocaleDateString('ar-EG');
+      const date = new Date(result.completedAt).toLocaleDateString('ar-EG', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
       
       resultElement.innerHTML = `
         <div class="result-info">

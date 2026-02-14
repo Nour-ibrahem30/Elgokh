@@ -8,10 +8,10 @@
     
     <!-- SEO Meta Tags -->
     <title>منصة الفلسفة والمنطق التعليمية | دروس وامتحانات تفاعلية للثانوية العامة</title>
-    <meta name="description" content="منصة تعليمية متطورة للفلسفة والمنطق - المرحلة الثانوية. دروس فيديو شاملة، امتحانات تفاعلية، مذكرات PDF، وملاحظات ذكية. انضم الآن وحقق التفوق!">
-    <meta name="keywords" content="فلسفة, منطق, ثانوية عامة, دروس فلسفة, امتحانات فلسفة, مذكرات فلسفة, تعليم أونلاين, منصة تعليمية">
-    <meta name="author" content="منصة الفلسفة والمنطق">
-    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="description" content="منصة تعليمية متطورة للفلسفة والمنطق للمرحلة الثانوية. دروس فيديو شاملة، امتحانات تفاعلية، مذكرات PDF، وملاحظات ذكية. انضم الآن وحقق التفوق مع أفضل المعلمين!">
+    <meta name="keywords" content="فلسفة, منطق, ثانوية عامة, دروس فلسفة, امتحانات فلسفة, مذكرات فلسفة, تعليم أونلاين, منصة تعليمية, محمد ناصر">
+    <meta name="author" content="منصة محمد ناصر التعليمية">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="website">
@@ -38,6 +38,7 @@
     <!-- Preconnect for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://firebasestorage.googleapis.com">
     <link rel="dns-prefetch" href="https://www.gstatic.com">
     <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com">
     
@@ -46,11 +47,11 @@
         /* Critical Above-the-Fold Styles */
         *{margin:0;padding:0;box-sizing:border-box}
         html{scroll-behavior:smooth}
-        body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#f1f5f9;direction:rtl;min-height:100vh;line-height:1.6}
+        body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#f1f5f9;direction:rtl;min-height:100vh;line-height:1.6;overflow-x:hidden}
         .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}
         
         /* Navbar Critical Styles */
-        .navbar{background:rgba(30,41,59,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(59,130,246,.2);position:sticky;top:0;z-index:1000;transition:all .3s ease}
+        .navbar{background:rgba(30,41,59,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(59,130,246,.2);position:sticky;top:0;z-index:1000;transition:transform .3s}
         .nav-container{max-width:1400px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:70px}
         
         /* Hero Critical Styles */
@@ -58,42 +59,26 @@
         .hero-content{position:relative;z-index:1;text-align:center;max-width:800px}
         .hero-title{font-size:clamp(2rem,5vw,2.5rem);font-weight:bold;margin-bottom:1.5rem;background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
         
-        /* Button Critical Styles */
-        .btn{padding:1rem 2rem;border:none;border-radius:8px;cursor:pointer;font-weight:500;transition:all .3s ease;text-decoration:none;display:inline-block}
+        /* Button Critical Styles - Touch Target 48x48px minimum */
+        .btn{padding:1rem 2rem;border:none;border-radius:8px;cursor:pointer;font-weight:500;transition:transform .3s;text-decoration:none;display:inline-block;min-height:48px;min-width:48px;line-height:1.5}
         .btn-primary{background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff}
         .btn-secondary{background:rgba(59,130,246,.1);color:#3b82f6;border:2px solid rgba(59,130,246,.3)}
-        
-        /* Loading State */
-        .loading{display:flex;align-items:center;justify-content:center;min-height:100vh;font-size:1.5rem}
+        .btn:hover{transform:translateY(-2px)}
+        .btn:focus{outline:2px solid #3b82f6;outline-offset:2px}
     </style>
     
     <!-- Preload Critical Resources -->
     <link rel="preload" href="public/assets/css/main.css" as="style">
     <link rel="preload" href="public/assets/js/components-loader.js" as="script">
+    <link rel="preload" href="public/assets/js/mobile-menu.js" as="script">
     
     <!-- Async Load Non-Critical CSS -->
-    <link rel="stylesheet" href="public/assets/css/main.css" media="all">
-    <link rel="stylesheet" href="public/assets/css/pages_style/home.css" media="print" onload="this.media='all';this.onload=null;">
-    <link rel="stylesheet" href="public/assets/css/responsive.css" media="print" onload="this.media='all';this.onload=null;">
-    
-    <!-- Fallback for browsers without JS -->
-    <noscript>
-        <link rel="stylesheet" href="public/assets/css/pages_style/home.css">
-        <link rel="stylesheet" href="public/assets/css/responsive.css">
-    </noscript>
+    <link rel="stylesheet" href="public/assets/css/main.css">
+    <link rel="stylesheet" href="public/assets/css/pages_style/home.css">
+    <link rel="stylesheet" href="public/assets/css/responsive.css">
     
     <!-- Inline Small CSS for Performance -->
     <style>
-        #three-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-        
         .waves {
             position: fixed;
             bottom: 0;
@@ -112,6 +97,7 @@
             height: 100%;
             background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="%233b82f6" fill-opacity="0.05"/></svg>') repeat-x;
             animation: wave 15s linear infinite;
+            will-change: transform;
         }
 
         .wave:nth-child(2) {
@@ -140,7 +126,7 @@
     </style>
 </head>
 <body>
-    <canvas id="three-canvas"></canvas>
+    <!-- Removed Three.js canvas for better performance -->
     <div class="waves">
         <div class="wave"></div>
         <div class="wave"></div>
@@ -162,7 +148,7 @@
                     </div>
                 </div>
             </div>
-            <canvas id="hero-canvas" class="hero-canvas" aria-hidden="true"></canvas>
+
         </section>
 
         <section class="about" id="about" aria-labelledby="about-title">
@@ -227,7 +213,7 @@
     </style>
 
     <!-- Back to Top Button -->
-    <button id="backToTop" style="position: fixed; bottom: 2rem; right: 2rem; width: 50px; height: 50px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 50%; color: white; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); z-index: 999; display: none; transition: all 0.3s ease;" title="العودة للأعلى" aria-label="العودة للأعلى">
+    <button id="backToTop" style="position: fixed; bottom: 2rem; right: 2rem; min-width: 48px; min-height: 48px; width: 48px; height: 48px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; border-radius: 50%; color: white; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); z-index: 999; display: none; transition: all 0.3s ease;" title="العودة للأعلى" aria-label="العودة للأعلى">
         ↑
     </button>
 
@@ -237,105 +223,27 @@
         window.addEventListener('DOMContentLoaded',function(){var b=document.getElementById('backToTop');if(!b)return;var t=false;function u(){b.style.display=window.pageYOffset>300?'block':'none';t=false}window.addEventListener('scroll',function(){if(!t){requestAnimationFrame(u);t=true}},{passive:true});b.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})})});
     </script>
 
-    <!-- Load animations after page load -->
+    <!-- Simplified animations - no Three.js for better performance -->
     <script>
-        window.addEventListener('load',function(){if('connection' in navigator&&navigator.connection.saveData)return;var s=['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js','https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js','https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js'];function l(src,cb){var sc=document.createElement('script');sc.src=src;sc.async=true;sc.onload=cb;document.body.appendChild(sc)}l(s[0],function(){l(s[1],function(){l(s[2],function(){if(typeof initAnimations==='function')initAnimations()})})})});
-    </script>
-    <script>
-        // Three.js Scene - Lazy Init
-        function initAnimations() {
-        const canvas = document.getElementById('three-canvas');
-        if (!canvas || !window.THREE) return;
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        camera.position.z = 5;
-
-        // Create Brain-like structure
-        const brainGeometry = new THREE.IcosahedronGeometry(1.2, 1);
-        const brainMaterial = new THREE.MeshNormalMaterial({ 
-            wireframe: true,
-            opacity: 0.4,
-            transparent: true
-        });
-        const brain = new THREE.Mesh(brainGeometry, brainMaterial);
-        scene.add(brain);
-
-        // Create Logic Symbols
-        const symbolGeometry = new THREE.OctahedronGeometry(0.3);
-        const symbolMaterial = new THREE.MeshNormalMaterial({ 
-            wireframe: false,
-            opacity: 0.5,
-            transparent: true
-        });
-        
-        const symbols = [];
-        for (let i = 0; i < 8; i++) {
-            const symbol = new THREE.Mesh(symbolGeometry, symbolMaterial);
-            const angle = (i / 8) * Math.PI * 2;
-            symbol.position.x = Math.cos(angle) * 2.5;
-            symbol.position.y = Math.sin(angle) * 2.5;
-            symbol.position.z = Math.sin(angle * 2) * 0.5;
-            symbols.push(symbol);
-            scene.add(symbol);
-        }
-
-        // Create Particles
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 1000;
-        const posArray = new Float32Array(particlesCount * 3);
-
-        for (let i = 0; i < particlesCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 10;
-        }
-
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particlesMaterial = new THREE.PointsMaterial({ 
-            size: 0.02, 
-            color: 0x3b82f6,
-            opacity: 0.6,
-            transparent: true
-        });
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        scene.add(particlesMesh);
-
-        // Animation Loop
-        let time = 0;
-        function animate() {
-            requestAnimationFrame(animate);
-            time += 0.01;
-            
-            brain.rotation.x += 0.005;
-            brain.rotation.y += 0.008;
-            
-            symbols.forEach((symbol, i) => {
-                const angle = (i / 8) * Math.PI * 2 + time * 0.5;
-                symbol.position.x = Math.cos(angle) * 2.5;
-                symbol.position.y = Math.sin(angle) * 2.5;
-                symbol.rotation.x += 0.02;
-                symbol.rotation.y += 0.02;
+        // Skip animations on mobile or slow connections
+        if(window.innerWidth>768&&(!navigator.connection||!navigator.connection.saveData)){
+            // Load GSAP only for desktop
+            window.addEventListener('load',function(){
+                var s=document.createElement('script');
+                s.src='https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
+                s.async=true;
+                s.onload=function(){
+                    // Simple fade-in animations
+                    if(typeof gsap!=='undefined'){
+                        gsap.from('.hero-title',{opacity:0,y:30,duration:0.8});
+                        gsap.from('.hero-subtitle',{opacity:0,y:20,duration:0.8,delay:0.2});
+                        gsap.from('.hero-actions',{opacity:0,y:20,duration:0.8,delay:0.4});
+                    }
+                };
+                document.body.appendChild(s);
             });
-            
-            particlesMesh.rotation.y += 0.001;
-            
-            renderer.render(scene, camera);
-        }
-
-        animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
         }
     </script>
-    <script type="module" src="public/assets/js/main.js" defer></script>
-    <script src="public/assets/js/motivational-toast.js" defer></script>
-
     <!-- Mobile Menu Script -->
     <script src="public/assets/js/mobile-menu.js" defer></script>
     

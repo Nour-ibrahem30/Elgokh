@@ -1,54 +1,54 @@
-<nav class="navbar" id="mainNavbar">
+<nav class="navbar" id="mainNavbar" role="navigation" aria-label="القائمة الرئيسية">
     <div class="nav-container">
         <div class="nav-brand">
-            <a href="{{HOME}}" class="brand-link">
+            <a href="{{HOME}}" class="brand-link" aria-label="الصفحة الرئيسية">
                 <h2>🎓 منصة تعليمية</h2>
             </a>
         </div>
         <div class="nav-menu" id="navMenu">
             <div class="nav-links">
-                <a href="{{HOME}}" class="nav-link" data-page="home">
-                    <span class="nav-icon">🏠</span>
+                <a href="{{HOME}}" class="nav-link" data-page="home" aria-label="الرئيسية">
+                    <span class="nav-icon" aria-hidden="true">🏠</span>
                     <span class="nav-text">الرئيسية</span>
                 </a>
-                <a href="{{BASE}}videos.html" class="nav-link" data-page="videos">
-                    <span class="nav-icon">🎥</span>
+                <a href="{{BASE}}videos.html" class="nav-link" data-page="videos" aria-label="الفيديوهات">
+                    <span class="nav-icon" aria-hidden="true">🎥</span>
                     <span class="nav-text">الفيديوهات</span>
                 </a>
-                <a href="{{BASE}}materials.html" class="nav-link" data-page="materials">
-                    <span class="nav-icon">📚</span>
+                <a href="{{BASE}}materials.html" class="nav-link" data-page="materials" aria-label="المواد">
+                    <span class="nav-icon" aria-hidden="true">📚</span>
                     <span class="nav-text">المواد</span>
                 </a>
-                <a href="{{BASE}}exams.html" class="nav-link" data-page="exams">
-                    <span class="nav-icon">📝</span>
+                <a href="{{BASE}}exams.html" class="nav-link" data-page="exams" aria-label="الامتحانات">
+                    <span class="nav-icon" aria-hidden="true">📝</span>
                     <span class="nav-text">الامتحانات</span>
                 </a>
-                <a href="{{BASE}}notes.html" class="nav-link" data-page="notes">
-                    <span class="nav-icon">📋</span>
+                <a href="{{BASE}}notes.html" class="nav-link" data-page="notes" aria-label="الملاحظات">
+                    <span class="nav-icon" aria-hidden="true">📋</span>
                     <span class="nav-text">الملاحظات</span>
                 </a>
-                <a href="{{BASE}}profile.html" class="nav-link" data-page="profile">
-                    <span class="nav-icon">👤</span>
+                <a href="{{BASE}}profile.html" class="nav-link" data-page="profile" aria-label="ملفي الشخصي">
+                    <span class="nav-icon" aria-hidden="true">👤</span>
                     <span class="nav-text">ملفي الشخصي</span>
                 </a>
             </div>
             <div class="nav-actions">
                 <div class="user-menu" id="userMenu">
-                    <button class="user-btn" type="button" id="userMenuBtn">
-                        <div class="user-avatar" id="navUserAvatar">👤</div>
+                    <button class="user-btn" type="button" id="userMenuBtn" aria-expanded="false" aria-haspopup="true" aria-label="قائمة المستخدم">
+                        <div class="user-avatar" id="navUserAvatar" aria-hidden="true">👤</div>
                         <span class="user-name" id="navUserName">المستخدم</span>
-                        <span class="dropdown-arrow">▼</span>
+                        <span class="dropdown-arrow" aria-hidden="true">▼</span>
                     </button>
-                    <div class="user-dropdown" id="userDropdown">
-                        <a href="{{BASE}}profile.html" class="dropdown-item"><span>👤</span> الملف الشخصي</a>
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-item logout-btn" type="button" id="navLogoutBtn"><span>🚪</span> تسجيل الخروج</button>
+                    <div class="user-dropdown" id="userDropdown" role="menu" aria-label="خيارات المستخدم">
+                        <a href="{{BASE}}profile.html" class="dropdown-item" role="menuitem"><span aria-hidden="true">👤</span> الملف الشخصي</a>
+                        <div class="dropdown-divider" role="separator"></div>
+                        <button class="dropdown-item logout-btn" type="button" id="navLogoutBtn" role="menuitem"><span aria-hidden="true">🚪</span> تسجيل الخروج</button>
                     </div>
                 </div>
-                <a href="{{BASE}}login.html" class="btn btn-primary login-link" id="navLoginLink" style="display: none;">تسجيل الدخول</a>
+                <a href="{{BASE}}login.html" class="btn btn-primary login-link" id="navLoginLink" style="display: none;" aria-label="تسجيل الدخول">تسجيل الدخول</a>
             </div>
         </div>
-        <button class="nav-toggle" id="navToggle" type="button" aria-label="فتح القائمة">
+        <button class="nav-toggle" id="navToggle" type="button" aria-label="فتح القائمة" aria-expanded="false" aria-controls="navMenu">
             <span></span><span></span><span></span>
         </button>
     </div>

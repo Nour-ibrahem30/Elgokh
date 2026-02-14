@@ -143,6 +143,35 @@
             box-shadow: 0 5px 20px rgba(59, 130, 246, 0.4);
         }
 
+        .btn-start.btn-disabled {
+            background: rgba(100, 116, 139, 0.3);
+            color: #64748b;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn-start.btn-disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .completed-exam {
+            opacity: 0.8;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .completed-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            color: #10b981;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            margin-right: 0.5rem;
+        }
+
         .empty-state {
             text-align: center;
             padding: 4rem 2rem;
@@ -249,10 +278,10 @@
             }
 
             // Load exams from Firebase
-            await loadExams();
+            await loadExams(user);
         });
 
-        async function loadExams() {
+        async function loadExams(user) {
             try {
                 examsGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #94a3b8;">جاري تحميل الامتحانات...</div>';
                 
@@ -264,8 +293,23 @@
                     ...doc.data()
                 }));
 
+                // جلب نتائج الطالب
+                const resultsQuery = query(
+                    collection(db, 'examResults'),
+                    where('userId', '==', user.uid)
+                );
+                const resultsSnapshot = await getDocs(resultsQuery);
+                
+                const completedExamIds = new Set();
+                resultsSnapshot.forEach(doc => {
+                    completedExamIds.add(doc.data().examId);
+                });
+                
+                completedExamIdsGlobal = completedExamIds;
+
                 console.log('Loaded exams from Firebase:', allExams.length);
-                displayExams(allExams);
+                console.log('Completed exams:', completedExamIds.size);
+                displayExams(allExams, completedExamIds);
             } catch (error) {
                 console.error('Error loading exams:', error);
                 examsGrid.innerHTML = `
@@ -278,7 +322,7 @@
             }
         }
 
-        function displayExams(exams) {
+        function displayExams(exams, completedExamIds = new Set()) {
             if (exams.length === 0) {
                 examsGrid.innerHTML = `
                     <div class="empty-state" style="grid-column: 1/-1;">
@@ -293,10 +337,12 @@
             examsGrid.innerHTML = exams.map(exam => {
                 // تحديد نوع الامتحان
                 const isInternal = exam.examType === 'internal' && exam.questions && exam.questions.length > 0;
+                const isCompleted = completedExamIds.has(exam.id);
                 
                 return `
-                    <div class="exam-card">
+                    <div class="exam-card ${isCompleted ? 'completed-exam' : ''}">
                         <span class="exam-type">${isInternal ? '📝 امتحان مدمج' : '🔗 امتحان خارجي'}</span>
+                        ${isCompleted ? '<span class="completed-badge">✅ تم الحل</span>' : ''}
                         <h3 class="exam-title">${exam.title}</h3>
                         ${exam.description ? `<p style="color: #94a3b8; margin-bottom: 1rem;">${exam.description}</p>` : ''}
                         <div class="exam-info">
@@ -310,9 +356,12 @@
                             </span>
                         </div>
                         <div class="exam-actions">
-                            <button class="btn-start" onclick="${isInternal ? `startInternalExam('${exam.id}')` : `window.open('${exam.examUrl}', '_blank')`}" aria-label="بدء ${exam.title}">
-                                <span aria-hidden="true">🚀</span>
-                                ابدأ الامتحان
+                            <button class="btn-start ${isCompleted ? 'btn-disabled' : ''}" 
+                                    ${isCompleted ? 'disabled' : ''}
+                                    onclick="${isCompleted ? '' : (isInternal ? `startInternalExam('${exam.id}')` : `window.open('${exam.examUrl}', '_blank')`)}" 
+                                    aria-label="${isCompleted ? 'تم حل هذا الامتحان' : 'بدء ' + exam.title}">
+                                <span aria-hidden="true">${isCompleted ? '✅' : '🚀'}</span>
+                                ${isCompleted ? 'تم الحل' : 'ابدأ الامتحان'}
                             </button>
                         </div>
                     </div>
@@ -859,6 +908,8 @@
         }
 
         // Filter functionality
+        let completedExamIdsGlobal = new Set();
+        
         filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 filterBtns.forEach(b => b.classList.remove('active'));
@@ -867,20 +918,14 @@
                 const filter = btn.dataset.filter;
                 
                 if (filter === 'all') {
-                    displayExams(allExams);
+                    displayExams(allExams, completedExamIdsGlobal);
                 } else {
                     // For now, show all exams since we don't have type filtering yet
-                    displayExams(allExams);
+                    displayExams(allExams, completedExamIdsGlobal);
                 }
             });
         });
     </script>
-    
-    <script src="../assets/dist/exams.js" type="module"></script>
-    <script>
-        // Exam Filters
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        const examsGrid = document.getElementById('examsGrid');
 
         filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
