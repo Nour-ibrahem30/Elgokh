@@ -556,7 +556,8 @@ async function rateVideo(videoId, rating) {
 
 <div align="center">
 
-## 🎓 منصة الفلسفة والمنطق التعليمية
+## 🎓 منصة الفلسفة والمنطق التعليمية<img width="1920" height="972" alt="الجوخ" src="https://github.com/user-attachments/assets/e3defaa0-c57b-4a57-b3f1-486bb0f9a38c" />
+
 
 **نحو مستقبل تعليمي أفضل**
 
