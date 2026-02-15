@@ -951,13 +951,13 @@ function initializeEventListeners() {
       const contentId = target.getAttribute('data-id');
       
       if (action === 'watch') {
-        window.location.href = `/public/pages/video-player.html?id=${contentId}`;
+        window.location.href = `video-player.html?id=${contentId}`;
       } else if (action === 'solve') {
-        window.location.href = `/public/pages/exam-player.html?id=${contentId}`;
+        window.location.href = `exam-player.html?id=${contentId}`;
       } else if (action === 'view') {
-        window.location.href = `/public/pages/materials.html#${contentId}`;
+        window.location.href = `materials.html#${contentId}`;
       } else if (action === 'read') {
-        window.location.href = `/public/pages/notes.html#${contentId}`;
+        window.location.href = `notes.html#${contentId}`;
       }
     }
   });
