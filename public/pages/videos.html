@@ -16,15 +16,51 @@
     <link rel="stylesheet" href="../assets/css/responsive.css">
     
     <!-- Auth Guard - Protect this page -->
+    <style id="auth-guard-style">
+        body { visibility: hidden; }
+    </style>
     <script>
-        // Hide content immediately before page loads
+        // Check authentication immediately
         (function() {
             const isAuthenticated = localStorage.getItem('currentUserEmail') && localStorage.getItem('currentUser');
-            if (!isAuthenticated) {
-                document.write('<style>body{display:none!important;visibility:hidden!important;}</style>');
-                setTimeout(function() {
-                    window.location.replace('/public/pages/login.html');
-                }, 100);
+            
+            if (isAuthenticated) {
+                // User is authenticated, show page
+                document.getElementById('auth-guard-style').remove();
+            } else {
+                // User is NOT authenticated, show modal
+                window.addEventListener('DOMContentLoaded', function() {
+                    document.body.innerHTML = '';
+                    document.body.style.visibility = 'visible';
+                    
+                    const modal = document.createElement('div');
+                    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#0f172a,#1e293b);display:flex;align-items:center;justify-content:center;z-index:99999;';
+                    
+                    const modalContent = document.createElement('div');
+                    modalContent.style.cssText = 'background:rgba(30,41,59,0.95);backdrop-filter:blur(20px);border:2px solid rgba(59,130,246,0.5);border-radius:20px;padding:2.5rem;max-width:450px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:modalSlide 0.4s ease;';
+                    
+                    modalContent.innerHTML = `
+                        <style>
+                            @keyframes modalSlide {
+                                from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+                                to { opacity: 1; transform: scale(1) translateY(0); }
+                            }
+                            @keyframes pulse {
+                                0%, 100% { transform: scale(1); }
+                                50% { transform: scale(1.05); }
+                            }
+                        </style>
+                        <div style="font-size:4rem;margin-bottom:1rem;animation:pulse 2s ease-in-out infinite;">🔒</div>
+                        <h2 style="color:#f1f5f9;font-size:1.8rem;margin-bottom:1rem;font-weight:700;">تسجيل الدخول مطلوب</h2>
+                        <p style="color:#94a3b8;font-size:1.1rem;line-height:1.6;margin-bottom:2rem;">يجب عليك تسجيل الدخول أولاً للوصول إلى هذه الصفحة والاستمتاع بجميع المميزات</p>
+                        <button onclick="window.location.href='/public/pages/login.html'" style="padding:1rem 2.5rem;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border:none;border-radius:12px;color:#fff;font-size:1.1rem;font-weight:600;cursor:pointer;transition:all 0.3s ease;box-shadow:0 4px 15px rgba(59,130,246,0.4);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 25px rgba(59,130,246,0.6)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 15px rgba(59,130,246,0.4)'">
+                            تسجيل الدخول الآن
+                        </button>
+                    `;
+                    
+                    modal.appendChild(modalContent);
+                    document.body.appendChild(modal);
+                });
             }
         })();
     </script>
